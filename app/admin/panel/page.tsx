@@ -23,7 +23,7 @@ export default async function AdminPanelPage({
     : "data/site-config.json";
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-16 pb-24">
+    <main className="mx-auto max-w-3xl px-3 py-12 pb-20 sm:px-4 sm:py-16 sm:pb-24">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-[family-name:var(--font-syne)] text-2xl font-bold text-white">
           Admin panel

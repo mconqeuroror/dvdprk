@@ -25,6 +25,12 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.davidperk.com"),
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#010409",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${syne.variable} ${dmSans.variable} min-h-screen antialiased`}
+        className={`${syne.variable} ${dmSans.variable} min-h-screen min-w-0 antialiased`}
       >
         <SiteHeader />
         {children}

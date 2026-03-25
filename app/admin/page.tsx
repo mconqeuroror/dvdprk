@@ -16,7 +16,7 @@ export default async function AdminLoginPage({
   const sp = await searchParams;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-16">
+    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-3 py-12 sm:px-4 sm:py-16">
       <p className="mb-2 text-center text-xs uppercase tracking-widest text-[var(--dp-muted)]">
         Hidden route
       </p>

@@ -17,20 +17,20 @@ export default async function FreeCoursePage() {
   const modules = config.freeCourseModules;
 
   return (
-    <div className="relative min-h-screen overflow-hidden pt-28 md:pt-32">
+    <div className="relative min-h-screen overflow-hidden pt-[calc(5.25rem+env(safe-area-inset-top,0px))] sm:pt-28 md:pt-32">
       <PageBackgroundGlow variant="freeCourse" />
-      <main className="relative z-[1] mx-auto max-w-6xl px-4 pb-24 md:px-6">
-        <h1 className="font-[family-name:var(--font-syne)] text-4xl font-bold leading-[1.05] tracking-tight text-white md:text-6xl lg:text-7xl">
+      <main className="relative z-[1] mx-auto min-w-0 max-w-6xl px-3 pb-16 sm:px-4 sm:pb-24 md:px-6">
+        <h1 className="font-[family-name:var(--font-syne)] text-[1.65rem] font-bold leading-[1.08] tracking-tight text-white min-[400px]:text-[1.85rem] sm:text-4xl sm:leading-[1.05] md:text-6xl lg:text-7xl">
           Free Forex Training
         </h1>
-        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[var(--dp-muted)] md:text-xl">
+        <p className="mt-5 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-6 sm:text-lg md:text-xl">
           You&apos;ve just unlocked access to our free Forex mini course.
         </p>
-        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--dp-muted)] md:text-xl">
+        <p className="mt-3 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-4 sm:text-lg md:text-xl">
           Keep it simple &amp; start with Module 1 and work through in order.
         </p>
 
-        <div className="mt-14 space-y-14 md:mt-16 md:space-y-16">
+        <div className="mt-10 space-y-10 sm:mt-14 sm:space-y-14 md:mt-16 md:space-y-16">
           {modules.map((mod, i) => (
             <section key={`${i}-${mod.tag.slice(0, 20)}`}>
               <p className="max-w-3xl whitespace-pre-line text-base leading-relaxed text-white md:text-lg">
@@ -47,14 +47,14 @@ export default async function FreeCoursePage() {
           ))}
         </div>
 
-        <section className="mx-auto mt-20 max-w-4xl md:mt-28">
-          <h2 className="text-center font-[family-name:var(--font-syne)] text-xl font-bold uppercase tracking-[0.12em] text-white md:text-2xl">
+        <section className="mx-auto mt-14 max-w-4xl sm:mt-20 md:mt-28">
+          <h2 className="text-center font-[family-name:var(--font-syne)] text-lg font-bold uppercase tracking-[0.1em] text-white sm:text-xl sm:tracking-[0.12em] md:text-2xl">
             Want to learn more?
           </h2>
-          <p className="mt-4 text-center text-lg text-[var(--dp-muted)] md:text-xl">
+          <p className="mt-3 text-center text-base text-[var(--dp-muted)] sm:mt-4 sm:text-lg md:text-xl">
             Book a live call with David below
           </p>
-          <div className="mt-8">
+          <div className="mt-6 sm:mt-8">
             <CalendlyEmbed minHeight={760} />
           </div>
         </section>

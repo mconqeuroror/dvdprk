@@ -15,7 +15,7 @@ function Frame({
   const u = url.trim();
   if (u) {
     return (
-      <figure className="dp-marquee-frame relative h-52 w-40 shrink-0 cursor-default overflow-hidden rounded-xl bg-[var(--dp-surface)]/40 shadow-lg transition-shadow duration-300 hover:shadow-[0_0_24px_rgba(98,67,255,0.25)]">
+      <figure className="dp-marquee-frame relative h-44 w-[7.25rem] shrink-0 cursor-default overflow-hidden rounded-lg bg-[var(--dp-surface)]/40 shadow-md transition-shadow duration-300 sm:h-52 sm:w-40 sm:rounded-xl sm:shadow-lg sm:hover:shadow-[0_0_24px_rgba(98,67,255,0.25)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={u}
@@ -31,7 +31,7 @@ function Frame({
 
   return (
     <div
-      className="dp-marquee-frame flex h-52 w-40 shrink-0 cursor-default items-center justify-center rounded-xl bg-white/[0.02] text-xs text-[var(--dp-muted)] transition-colors duration-300 hover:text-white/70"
+      className="dp-marquee-frame flex h-44 w-[7.25rem] shrink-0 cursor-default items-center justify-center rounded-lg bg-white/[0.02] text-[0.65rem] text-[var(--dp-muted)] transition-colors duration-300 sm:h-52 sm:w-40 sm:rounded-xl sm:text-xs hover:text-white/70"
       aria-hidden
     >
       Empty
@@ -55,14 +55,14 @@ function MarqueeTrack({
   return (
     <div className="dp-marquee-track relative overflow-hidden py-3">
       <div
-        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[var(--dp-bg)] via-[var(--dp-bg)]/90 to-transparent sm:w-28"
+        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-[var(--dp-bg)] via-[var(--dp-bg)]/90 to-transparent sm:w-16 md:w-28"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[var(--dp-bg)] via-[var(--dp-bg)]/90 to-transparent sm:w-28"
+        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[var(--dp-bg)] via-[var(--dp-bg)]/90 to-transparent sm:w-16 md:w-28"
         aria-hidden
       />
-      <div className={`flex w-max gap-4 ${scrollerClass}`}>
+      <div className={`flex w-max gap-3 sm:gap-4 ${scrollerClass}`}>
         {pair.map((src, idx) => (
           <Frame
             key={`${direction}-${idx}`}

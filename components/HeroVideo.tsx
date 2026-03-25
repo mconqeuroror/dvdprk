@@ -26,20 +26,25 @@ export function HeroVideo({
       ? "aspect-[9/16]"
       : "aspect-video";
 
+  const shellRadius =
+    "rounded-xl border border-white/10 md:rounded-2xl";
+  const placeholderRadius =
+    "rounded-xl border border-dashed border-white/20 md:rounded-2xl";
+
   const frame =
     layout === "grid"
-      ? `${aspect} w-full overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_16px_48px_rgba(0,0,0,0.45)]`
-      : `${aspect} w-full max-w-4xl overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_24px_80px_rgba(0,0,0,0.5)]`;
+      ? `${aspect} w-full min-w-0 overflow-hidden ${shellRadius} bg-black shadow-[0_12px_36px_rgba(0,0,0,0.4)] md:shadow-[0_16px_48px_rgba(0,0,0,0.45)]`
+      : `${aspect} w-full min-w-0 max-w-4xl overflow-hidden ${shellRadius} bg-black shadow-[0_16px_56px_rgba(0,0,0,0.45)] md:shadow-[0_24px_80px_rgba(0,0,0,0.5)]`;
 
   const videoCls =
     layout === "grid"
-      ? `${aspect} w-full rounded-2xl border border-white/10 bg-black object-cover shadow-[0_16px_48px_rgba(0,0,0,0.45)]`
-      : `${aspect} w-full max-w-4xl rounded-2xl border border-white/10 bg-black object-cover shadow-[0_24px_80px_rgba(0,0,0,0.5)]`;
+      ? `${aspect} w-full min-w-0 ${shellRadius} bg-black object-cover shadow-[0_12px_36px_rgba(0,0,0,0.4)] md:shadow-[0_16px_48px_rgba(0,0,0,0.45)]`
+      : `${aspect} w-full min-w-0 max-w-4xl ${shellRadius} bg-black object-cover shadow-[0_16px_56px_rgba(0,0,0,0.45)] md:shadow-[0_24px_80px_rgba(0,0,0,0.5)]`;
 
   const placeholderShell =
     layout === "grid"
-      ? `flex ${aspect} w-full items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.03] px-4 text-center text-xs text-[var(--dp-muted)] sm:text-sm`
-      : `flex ${aspect} w-full max-w-4xl items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.03] px-6 text-center text-sm text-[var(--dp-muted)]`;
+      ? `flex ${aspect} w-full min-w-0 items-center justify-center ${placeholderRadius} bg-white/[0.03] px-3 text-center text-[0.7rem] leading-snug text-[var(--dp-muted)] sm:px-4 sm:text-xs md:text-sm`
+      : `flex ${aspect} w-full min-w-0 max-w-4xl items-center justify-center ${placeholderRadius} bg-white/[0.03] px-4 text-center text-xs text-[var(--dp-muted)] sm:px-6 sm:text-sm`;
 
   if (yt) {
     return (

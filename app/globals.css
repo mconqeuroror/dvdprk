@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  overflow-x: hidden;
+}
+
 :root {
   --dp-bg: #010409;
   --dp-surface: #14113a;
@@ -82,8 +86,15 @@ body {
 
 .calendly-inline-widget,
 .calendly-inline-widget iframe {
-  border-radius: 14px;
+  border-radius: 12px;
   overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .calendly-inline-widget,
+  .calendly-inline-widget iframe {
+    border-radius: 14px;
+  }
 }
 
 .calendly-inline-widget {
