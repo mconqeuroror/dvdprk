@@ -55,11 +55,19 @@ function MarqueeTrack({
   return (
     <div className="dp-marquee-track relative overflow-hidden py-3">
       <div
-        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-[var(--dp-bg)] via-[var(--dp-bg)]/90 to-transparent sm:w-16 md:w-28"
+        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-[var(--dp-bg)] via-[var(--dp-bg)]/88 to-transparent sm:w-16 md:w-28"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[var(--dp-bg)] via-[var(--dp-bg)]/90 to-transparent sm:w-16 md:w-28"
+        className="pointer-events-none absolute inset-y-0 left-0 z-[11] w-2 bg-gradient-to-r from-white/35 to-transparent shadow-[8px_0_28px_rgba(255,255,255,0.2)] sm:w-2.5 sm:shadow-[12px_0_36px_rgba(255,255,255,0.22)]"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[var(--dp-bg)] via-[var(--dp-bg)]/88 to-transparent sm:w-16 md:w-28"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 z-[11] w-2 bg-gradient-to-l from-white/35 to-transparent shadow-[-8px_0_28px_rgba(255,255,255,0.2)] sm:w-2.5 sm:shadow-[-12px_0_36px_rgba(255,255,255,0.22)]"
         aria-hidden
       />
       <div className={`flex w-max gap-3 sm:gap-4 ${scrollerClass}`}>

@@ -43,7 +43,7 @@ export default async function HomePage() {
 
           <div className="mx-auto mt-8 flex w-full max-w-4xl flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4">
             <Link href="/basic-course" className={basicCourseCtaClass}>
-              Basic course
+              Join now!
             </Link>
             <Link href="/book" className={bookCallCtaClass}>
               Book a call

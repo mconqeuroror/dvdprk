@@ -19,11 +19,11 @@ export default async function BasicCoursePage() {
   const modules = config.freeCourseModules;
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden pt-[max(1.25rem,env(safe-area-inset-top))] sm:pt-10 md:pt-12">
+    <div className="relative min-h-screen overflow-x-clip overflow-y-visible pt-[max(1.25rem,env(safe-area-inset-top))] sm:pt-10 md:pt-12">
       <PageBackgroundGlow variant="basicCourse" />
       {process.env.NODE_ENV === "development" ? <DevScrollGrid /> : null}
       <main className="relative z-[1] mx-auto min-w-0 max-w-6xl px-3 pb-16 text-center sm:px-4 sm:pb-24 md:px-6">
-        <h1 className="font-[family-name:var(--font-syne)] pb-[0.2em] text-[1.65rem] font-bold leading-[1.14] tracking-tight text-white min-[400px]:text-[1.85rem] sm:text-4xl sm:leading-[1.12] md:text-6xl md:leading-[1.1] lg:text-7xl lg:leading-[1.1]">
+        <h1 className="overflow-visible pb-[0.35em] font-[family-name:var(--font-syne)] text-[1.65rem] font-bold leading-[1.22] tracking-tight text-white min-[400px]:text-[1.85rem] sm:text-4xl sm:leading-[1.2] md:text-6xl md:leading-[1.18] lg:text-7xl lg:leading-[1.18]">
           Basic Forex training
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-6 sm:text-lg md:text-xl">
