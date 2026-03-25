@@ -1,0 +1,35 @@
+<svg width="1021" height="565" viewBox="0 0 1021 565" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Header mark: same DP shapes as logo.svg but no feGaussianBlur (avoids rasterized blur at small sizes). -->
+  <path
+    d="M70 70H461L574 181.5L548.5 348.5L431.5 441.5H112L132.5 339L160 192.5H263.5L245.5 339H398.5L451 300L467.5 215.5L425 172H174.5L70 70Z"
+    fill="url(#paint0_linear_logo_nav)"
+  />
+  <path
+    d="M496 77H951V240L886 296.5L829.5 342H656L654 358L650 384.5L629 494.5H545.5L594.5 233H800.5L838.5 200.5V182.5L599.5 184.5L496 77Z"
+    fill="url(#paint1_linear_logo_nav)"
+  />
+  <defs>
+    <linearGradient
+      id="paint0_linear_logo_nav"
+      x1="322"
+      y1="70"
+      x2="322"
+      y2="441.5"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="white" />
+      <stop offset="1" stop-color="#999999" />
+    </linearGradient>
+    <linearGradient
+      id="paint1_linear_logo_nav"
+      x1="723.5"
+      y1="77"
+      x2="723.5"
+      y2="494.5"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="white" />
+      <stop offset="1" stop-color="#999999" />
+    </linearGradient>
+  </defs>
+</svg>
