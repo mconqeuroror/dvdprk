@@ -17,8 +17,8 @@ export function SiteHeader() {
               <img
                 src="/logo.svg"
                 alt=""
-                width={1021}
-                height={565}
+                width={889}
+                height={433}
                 className="h-[1.6rem] w-auto shrink-0 opacity-95 md:h-[1.8rem]"
                 aria-hidden
               />
