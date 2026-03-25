@@ -16,8 +16,8 @@ export function SiteHeader() {
               <img
                 src="/logo.svg"
                 alt=""
-                width={889}
-                height={433}
+                width={1021}
+                height={565}
                 fetchPriority="high"
                 decoding="async"
                 className="h-7 w-auto shrink-0 opacity-95 sm:h-[1.6rem] md:h-[1.8rem]"
