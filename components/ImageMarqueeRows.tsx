@@ -15,7 +15,7 @@ function Frame({
   const u = url.trim();
   if (u) {
     return (
-      <figure className="dp-marquee-frame relative h-52 w-40 shrink-0 cursor-default overflow-hidden rounded-xl border border-white/15 bg-[var(--dp-surface)]/40 shadow-lg transition-shadow duration-300 hover:border-white/25 hover:shadow-[0_0_24px_rgba(98,67,255,0.25)]">
+      <figure className="dp-marquee-frame relative h-52 w-40 shrink-0 cursor-default overflow-hidden rounded-xl bg-[var(--dp-surface)]/40 shadow-lg transition-shadow duration-300 hover:shadow-[0_0_24px_rgba(98,67,255,0.25)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={u}
@@ -31,7 +31,7 @@ function Frame({
 
   return (
     <div
-      className="dp-marquee-frame flex h-52 w-40 shrink-0 cursor-default items-center justify-center rounded-xl border border-dashed border-white/15 bg-white/[0.02] text-xs text-[var(--dp-muted)] transition-colors duration-300 hover:border-white/25 hover:text-white/70"
+      className="dp-marquee-frame flex h-52 w-40 shrink-0 cursor-default items-center justify-center rounded-xl bg-white/[0.02] text-xs text-[var(--dp-muted)] transition-colors duration-300 hover:text-white/70"
       aria-hidden
     >
       Empty
