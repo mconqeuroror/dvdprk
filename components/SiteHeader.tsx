@@ -17,7 +17,9 @@ export function SiteHeader() {
                 alt=""
                 width={889}
                 height={433}
-                className="h-6 w-auto shrink-0 opacity-95 sm:h-[1.6rem] md:h-[1.8rem]"
+                fetchPriority="high"
+                decoding="async"
+                className="h-7 w-auto shrink-0 opacity-95 sm:h-[1.6rem] md:h-[1.8rem]"
                 aria-hidden
               />
               <span className="truncate">David Perk</span>
