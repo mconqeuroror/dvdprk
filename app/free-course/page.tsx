@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CalendlyEmbed } from "@/components/CalendlyEmbed";
 import { HeroVideo } from "@/components/HeroVideo";
+import { DevScrollGrid } from "@/components/DevScrollGrid";
 import { PageBackgroundGlow } from "@/components/PageBackgroundGlow";
 import { SiteFooter } from "@/components/SiteFooter";
 import { getSiteConfig } from "@/lib/site-config";
@@ -20,6 +21,7 @@ export default async function FreeCoursePage() {
   return (
     <div className="relative min-h-screen overflow-x-hidden pt-[calc(5.25rem+env(safe-area-inset-top,0px))] sm:pt-28 md:pt-32">
       <PageBackgroundGlow variant="freeCourse" />
+      {process.env.NODE_ENV === "development" ? <DevScrollGrid /> : null}
       <main className="relative z-[1] mx-auto min-w-0 max-w-6xl px-3 pb-16 sm:px-4 sm:pb-24 md:px-6">
         <h1 className="font-[family-name:var(--font-syne)] pb-[0.2em] text-[1.65rem] font-bold leading-[1.14] tracking-tight text-white min-[400px]:text-[1.85rem] sm:text-4xl sm:leading-[1.12] md:text-6xl md:leading-[1.1] lg:text-7xl lg:leading-[1.1]">
           Free Forex Training

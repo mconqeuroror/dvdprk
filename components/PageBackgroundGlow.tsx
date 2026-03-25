@@ -31,7 +31,7 @@ export function PageBackgroundGlow({
   return (
     <div
       className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.32] sm:opacity-40"
-      aria-hidden
+      aria-hidden={true}
     >
       <div className={L.accent} />
       <div className={L.violet} />

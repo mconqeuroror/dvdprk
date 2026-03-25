@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CalendlyEmbed } from "@/components/CalendlyEmbed";
+import { DevScrollGrid } from "@/components/DevScrollGrid";
 import { PageBackgroundGlow } from "@/components/PageBackgroundGlow";
 import { SiteFooter } from "@/components/SiteFooter";
 
@@ -13,6 +14,7 @@ export default function BookPage() {
   return (
     <div className="relative min-h-screen overflow-hidden pt-[calc(5.25rem+env(safe-area-inset-top,0px))] sm:pt-28 md:pt-32">
       <PageBackgroundGlow variant="book" />
+      {process.env.NODE_ENV === "development" ? <DevScrollGrid /> : null}
       <main className="relative z-[1] mx-auto min-w-0 max-w-4xl px-3 pb-16 sm:px-4 sm:pb-20 md:px-6">
         <Link
           href="/"

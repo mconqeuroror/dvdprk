@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { HeroVideo } from "@/components/HeroVideo";
 import { ImageMarqueeRows } from "@/components/ImageMarqueeRows";
+import { DevScrollGrid } from "@/components/DevScrollGrid";
 import { PageBackgroundGlow } from "@/components/PageBackgroundGlow";
 import { SiteFooter } from "@/components/SiteFooter";
 import { getSiteConfig } from "@/lib/site-config";
@@ -22,6 +23,7 @@ export default async function HomePage() {
   return (
     <div className="relative min-h-screen overflow-hidden pt-[calc(5.25rem+env(safe-area-inset-top,0px))] sm:pt-28 md:pt-32">
       <PageBackgroundGlow variant="home" />
+      {process.env.NODE_ENV === "development" ? <DevScrollGrid /> : null}
 
       <main className="relative z-[1] min-w-0 pb-16 sm:pb-24">
         <div className="mx-auto max-w-6xl px-3 sm:px-4 md:px-6">
