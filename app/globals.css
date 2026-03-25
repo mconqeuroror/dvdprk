@@ -75,7 +75,7 @@ body {
   -webkit-mask-composite: xor;
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
-  animation: dp-glow-sweep 4.8s linear infinite;
+  animation: dp-glow-sweep 7s linear infinite;
   pointer-events: none;
 }
 
