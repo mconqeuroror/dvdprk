@@ -71,10 +71,15 @@ export async function saveMediaFieldAction(
         while (modules.length <= i) {
           modules.push({
             tag: `Module ${modules.length + 1}`,
+            description: "",
             videoUrl: "",
           });
         }
-        const prev = modules[i] ?? { tag: `Module ${i + 1}`, videoUrl: "" };
+        const prev = modules[i] ?? {
+          tag: `Module ${i + 1}`,
+          description: "",
+          videoUrl: "",
+        };
         modules[i] = { ...prev, videoUrl: url };
         config.freeCourseModules = normalizeFreeCourseModules(modules);
         break;
@@ -125,10 +130,11 @@ export async function saveSiteConfigAction(formData: FormData) {
             const o = item as Record<string, unknown>;
             return {
               tag: String(o.tag ?? "").trim() || `Module ${i + 1}`,
+              description: String(o.description ?? ""),
               videoUrl: String(o.videoUrl ?? "").trim(),
             };
           }
-          return { tag: `Module ${i + 1}`, videoUrl: "" };
+          return { tag: `Module ${i + 1}`, description: "", videoUrl: "" };
         });
       } else {
         freeCourseModules = normalizeFreeCourseModules([]);

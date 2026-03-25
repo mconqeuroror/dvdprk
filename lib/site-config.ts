@@ -8,7 +8,10 @@ import path from "path";
 import { hasDatabaseUrl, prisma } from "@/lib/prisma";
 
 export type FreeCourseModule = {
+  /** Short title / heading shown above the description and video */
   tag: string;
+  /** Optional body copy below the title (supports line breaks) */
+  description: string;
   videoUrl: string;
 };
 
@@ -23,9 +26,9 @@ export type SiteConfig = {
 const CONFIG_PATH = path.join(process.cwd(), "data", "site-config.json");
 
 const DEFAULT_FREE_MODULES: FreeCourseModule[] = [
-  { tag: "Module 1", videoUrl: "" },
-  { tag: "Module 2", videoUrl: "" },
-  { tag: "Module 3", videoUrl: "" },
+  { tag: "Module 1", description: "", videoUrl: "" },
+  { tag: "Module 2", description: "", videoUrl: "" },
+  { tag: "Module 3", description: "", videoUrl: "" },
 ];
 
 const DEFAULTS: SiteConfig = {
@@ -69,12 +72,14 @@ export function normalizeFreeCourseModules(raw: unknown): FreeCourseModule[] {
       const o = item as Record<string, unknown>;
       const tag = String(o.tag ?? "").trim();
       const videoUrl = String(o.videoUrl ?? "").trim();
+      const description = String(o.description ?? "");
       return {
         tag: tag || `Module ${i + 1}`,
+        description,
         videoUrl,
       };
     }
-    return { tag: `Module ${i + 1}`, videoUrl: "" };
+    return { tag: `Module ${i + 1}`, description: "", videoUrl: "" };
   });
 }
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { HeroVideo } from "@/components/HeroVideo";
 import { ImageMarqueeRows } from "@/components/ImageMarqueeRows";
 import { PageBackgroundGlow } from "@/components/PageBackgroundGlow";
+import { SiteFooter } from "@/components/SiteFooter";
 import { getSiteConfig } from "@/lib/site-config";
 
 export const dynamic = "force-dynamic";
@@ -87,9 +88,7 @@ export default async function HomePage() {
         </div>
       </main>
 
-      <footer className="relative z-[1] border-t border-white/10 py-8 text-center text-xs text-[var(--dp-muted)] sm:py-10 sm:text-sm">
-        © {new Date().getFullYear()} David Perk
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

@@ -11,11 +11,15 @@ export function FreeCourseModulesEditor({
 }) {
   const [modules, setModules] = useState<FreeCourseModule[]>(() =>
     initial.length > 0
-      ? initial.map((m) => ({ ...m }))
+      ? initial.map((m) => ({
+          tag: m.tag,
+          description: m.description ?? "",
+          videoUrl: m.videoUrl ?? "",
+        }))
       : [
-          { tag: "Module 1", videoUrl: "" },
-          { tag: "Module 2", videoUrl: "" },
-          { tag: "Module 3", videoUrl: "" },
+          { tag: "Module 1", description: "", videoUrl: "" },
+          { tag: "Module 2", description: "", videoUrl: "" },
+          { tag: "Module 3", description: "", videoUrl: "" },
         ],
   );
 
@@ -32,7 +36,7 @@ export function FreeCourseModulesEditor({
   const add = () => {
     setModules((prev) => [
       ...prev,
-      { tag: `Module ${prev.length + 1}`, videoUrl: "" },
+      { tag: `Module ${prev.length + 1}`, description: "", videoUrl: "" },
     ]);
   };
 
@@ -62,7 +66,7 @@ export function FreeCourseModulesEditor({
             </button>
           </div>
           <label className="mb-1 block text-xs text-[var(--dp-muted)]">
-            Tag / paragraph (shown above video)
+            Module title (centered, bold — shown above description &amp; video)
           </label>
           <textarea
             value={mod.tag}
@@ -70,6 +74,16 @@ export function FreeCourseModulesEditor({
             rows={2}
             className="mb-3 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none ring-[var(--dp-accent)] focus:ring-2"
             placeholder="e.g. Module 1 — Welcome"
+          />
+          <label className="mb-1 block text-xs text-[var(--dp-muted)]">
+            Module description (optional — body text under the title)
+          </label>
+          <textarea
+            value={mod.description}
+            onChange={(e) => update(i, { description: e.target.value })}
+            rows={4}
+            className="mb-3 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none ring-[var(--dp-accent)] focus:ring-2"
+            placeholder="What this module covers…"
           />
           <label className="mb-1 block text-xs text-[var(--dp-muted)]">
             Video — upload, remove, or paste a link (Save link after paste)

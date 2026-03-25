@@ -9,9 +9,9 @@ const defaultSitePayload = {
   sliderRow2: Array(10).fill(""),
   successVideos: ["", "", ""],
   freeCourseModules: [
-    { tag: "Module 1", videoUrl: "" },
-    { tag: "Module 2", videoUrl: "" },
-    { tag: "Module 3", videoUrl: "" },
+    { tag: "Module 1", description: "", videoUrl: "" },
+    { tag: "Module 2", description: "", videoUrl: "" },
+    { tag: "Module 3", description: "", videoUrl: "" },
   ],
 };
 

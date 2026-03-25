@@ -140,10 +140,11 @@ export default async function AdminPanelPage({
           Free course modules
         </h2>
         <p className="text-xs text-[var(--dp-muted)]">
-          Shown on <code className="text-white/70">/free-course</code>. Video
-          uploads save immediately per slot (by position). After you add or
-          remove modules, click Save below first so uploads match the right
-          module. The button saves labels, order, and list only.
+          Shown on <code className="text-white/70">/free-course</code>. Each
+          module: title, optional description (body under the title), then
+          video. Video uploads save immediately per slot (by position). After
+          you add or remove modules, click Save below first so uploads match
+          the right module. Save stores title, description, order, and list.
         </p>
         <div className="mt-4">
           <FreeCourseModulesEditor initial={config.freeCourseModules} />
@@ -152,7 +153,7 @@ export default async function AdminPanelPage({
           type="submit"
           className="rounded-full bg-[var(--dp-accent)] px-8 py-3 text-sm font-semibold text-white hover:opacity-90"
         >
-          Save module text &amp; list
+          Save module titles, descriptions &amp; list
         </button>
       </form>
     </main>

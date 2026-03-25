@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CalendlyEmbed } from "@/components/CalendlyEmbed";
 import { PageBackgroundGlow } from "@/components/PageBackgroundGlow";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "Book a call",
@@ -29,6 +30,7 @@ export default function BookPage() {
           <CalendlyEmbed minHeight={800} />
         </div>
       </main>
+      <SiteFooter />
     </div>
   );
 }
