@@ -8,7 +8,10 @@ import { getSiteConfig } from "@/lib/site-config";
 export const dynamic = "force-dynamic";
 
 const freeCourseCtaClass =
-  "dp-cta-glow-primary inline-flex h-11 w-full max-w-sm origin-center items-center justify-center rounded-full bg-[var(--dp-accent)] px-6 text-sm font-bold text-white transition-transform duration-300 ease-out hover:scale-[1.02] hover:sm:scale-110 sm:h-12 sm:w-auto sm:max-w-none sm:px-10 active:scale-[0.98]";
+  "dp-cta-glow-primary mx-auto inline-flex h-11 w-full max-w-sm origin-center items-center justify-center rounded-full bg-[var(--dp-accent)] px-6 text-sm font-bold text-white transition-transform duration-300 ease-out hover:scale-[1.02] hover:sm:scale-110 sm:mx-0 sm:h-12 sm:w-auto sm:max-w-none sm:min-w-[12rem] sm:px-10 active:scale-[0.98]";
+
+const bookCallCtaClass =
+  "dp-cta-glow-outline mx-auto inline-flex h-11 w-full max-w-sm origin-center items-center justify-center rounded-full border-2 border-white/90 bg-transparent px-6 text-sm font-bold text-white transition-all duration-300 ease-out hover:scale-[1.02] hover:border-[var(--dp-accent)] hover:bg-white/[0.06] hover:sm:scale-105 sm:mx-0 sm:h-12 sm:w-auto sm:max-w-none sm:min-w-[12rem] sm:px-10 active:scale-[0.98]";
 
 const sectionHeadingClass =
   "font-[family-name:var(--font-syne)] text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl";
@@ -22,7 +25,7 @@ export default async function HomePage() {
 
       <main className="relative z-[1] min-w-0 pb-16 sm:pb-24">
         <div className="mx-auto max-w-6xl px-3 sm:px-4 md:px-6">
-          <p className="mb-3 font-[family-name:var(--font-syne)] text-[0.65rem] font-semibold uppercase leading-snug tracking-[0.18em] text-[var(--dp-accent)] sm:mb-4 sm:text-xs sm:tracking-[0.2em]">
+          <p className="mb-3 font-[family-name:var(--font-syne)] text-[0.65rem] font-semibold uppercase leading-snug tracking-[0.18em] text-white/90 sm:mb-4 sm:text-xs sm:tracking-[0.2em]">
             Patience · skill · discipline
           </p>
           <h1 className="font-[family-name:var(--font-syne)] text-[1.65rem] font-bold leading-[1.08] tracking-tight text-white min-[400px]:text-[1.85rem] sm:text-4xl sm:leading-[1.05] md:text-6xl lg:text-7xl">
@@ -39,9 +42,12 @@ export default async function HomePage() {
             <HeroVideo url={config.heroVideoUrl} />
           </div>
 
-          <div className="mx-auto mt-8 flex w-full max-w-4xl justify-center sm:mt-10">
+          <div className="mx-auto mt-8 flex w-full max-w-4xl flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
             <Link href="/free-course" className={freeCourseCtaClass}>
               Get the free course
+            </Link>
+            <Link href="/book" className={bookCallCtaClass}>
+              Book a call
             </Link>
           </div>
         </div>

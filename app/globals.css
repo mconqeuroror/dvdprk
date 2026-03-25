@@ -79,6 +79,20 @@ body {
   pointer-events: none;
 }
 
+/* Desktop: scroll-driven tint (0 → 60% max) over the glass fill — content stays z-1 */
+@media (min-width: 768px) {
+  .glass-nav-shell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 16px;
+    background: var(--dp-bg);
+    opacity: var(--nav-scroll-tint, 0);
+    pointer-events: none;
+  }
+}
+
 .glass-nav-inner {
   position: relative;
   z-index: 1;
@@ -114,6 +128,19 @@ body {
     0 0 0 1px rgba(255, 255, 255, 0.22),
     0 0 32px rgba(98, 67, 255, 0.75),
     0 0 72px rgba(98, 67, 255, 0.38);
+}
+
+/* Inverted hero CTA — white ring + text; accent on hover */
+.dp-cta-glow-outline {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.55),
+    0 0 18px rgba(255, 255, 255, 0.06);
+}
+.dp-cta-glow-outline:hover {
+  box-shadow:
+    0 0 0 1px rgba(98, 67, 255, 0.85),
+    0 0 28px rgba(98, 67, 255, 0.45),
+    0 0 48px rgba(255, 255, 255, 0.12);
 }
 
 .dp-cta-glow-secondary {

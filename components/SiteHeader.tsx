@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { GlassNavShell } from "@/components/GlassNavShell";
 import { SiteHeaderNav } from "@/components/SiteHeaderNav";
 
 export function SiteHeader() {
   return (
     <header className="pointer-events-none fixed left-0 right-0 top-0 z-50 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-4 md:px-6 md:pt-4">
       <div className="pointer-events-auto mx-auto max-w-6xl">
-        <div className="glass-nav-shell">
+        <GlassNavShell>
           <div className="glass-nav-inner flex h-[3.5rem] items-center justify-between gap-3 px-3 sm:h-16 sm:gap-4 sm:px-5 md:h-[72px] md:px-8">
             <Link
               href="/"
@@ -26,7 +27,7 @@ export function SiteHeader() {
             </Link>
             <SiteHeaderNav />
           </div>
-        </div>
+        </GlassNavShell>
       </div>
     </header>
   );
