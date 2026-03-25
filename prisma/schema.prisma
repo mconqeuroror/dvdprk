@@ -1,0 +1,30 @@
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  loginAlias   String?  @unique @map("login_alias")
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("admin_users")
+}
+
+/// Single row `id = "site"` — JSON payload matches SiteConfig (hero + sliders + success videos + free-course modules).
+model SiteSettings {
+  id        String   @id
+  payload   Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}

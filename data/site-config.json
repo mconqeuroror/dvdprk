@@ -1,0 +1,11 @@
+{
+  "heroVideoUrl": "",
+  "sliderRow1": ["", "", "", "", "", "", "", "", "", ""],
+  "sliderRow2": ["", "", "", "", "", "", "", "", "", ""],
+  "successVideos": ["", "", ""],
+  "freeCourseModules": [
+    { "tag": "Module 1", "videoUrl": "" },
+    { "tag": "Module 2", "videoUrl": "" },
+    { "tag": "Module 3", "videoUrl": "" }
+  ]
+}
