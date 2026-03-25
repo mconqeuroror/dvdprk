@@ -4,6 +4,8 @@ type HeroVideoProps = {
   url: string;
   /** `hero` = centered max width; `grid` = full width of column */
   layout?: "hero" | "grid";
+  /** `9:16` = portrait (e.g. shorts); default `16:9` */
+  aspectRatio?: "16:9" | "9:16";
   embedTitle?: string;
   /** Shown in empty placeholder (e.g. “Video 1”) */
   placeholderLabel?: string;
@@ -12,26 +14,32 @@ type HeroVideoProps = {
 export function HeroVideo({
   url,
   layout = "hero",
+  aspectRatio = "16:9",
   embedTitle = "Video",
   placeholderLabel,
 }: HeroVideoProps) {
   const trimmed = url.trim();
   const yt = trimmed ? getYoutubeEmbedUrl(trimmed) : null;
 
+  const aspect =
+    aspectRatio === "9:16"
+      ? "aspect-[9/16]"
+      : "aspect-video";
+
   const frame =
     layout === "grid"
-      ? "aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_16px_48px_rgba(0,0,0,0.45)]"
-      : "aspect-video w-full max-w-4xl overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_24px_80px_rgba(0,0,0,0.5)]";
+      ? `${aspect} w-full overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_16px_48px_rgba(0,0,0,0.45)]`
+      : `${aspect} w-full max-w-4xl overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_24px_80px_rgba(0,0,0,0.5)]`;
 
   const videoCls =
     layout === "grid"
-      ? "aspect-video w-full rounded-2xl border border-white/10 bg-black object-cover shadow-[0_16px_48px_rgba(0,0,0,0.45)]"
-      : "aspect-video w-full max-w-4xl rounded-2xl border border-white/10 bg-black object-cover shadow-[0_24px_80px_rgba(0,0,0,0.5)]";
+      ? `${aspect} w-full rounded-2xl border border-white/10 bg-black object-cover shadow-[0_16px_48px_rgba(0,0,0,0.45)]`
+      : `${aspect} w-full max-w-4xl rounded-2xl border border-white/10 bg-black object-cover shadow-[0_24px_80px_rgba(0,0,0,0.5)]`;
 
   const placeholderShell =
     layout === "grid"
-      ? "flex aspect-video w-full items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.03] px-4 text-center text-xs text-[var(--dp-muted)] sm:text-sm"
-      : "flex aspect-video w-full max-w-4xl items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.03] px-6 text-center text-sm text-[var(--dp-muted)]";
+      ? `flex ${aspect} w-full items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.03] px-4 text-center text-xs text-[var(--dp-muted)] sm:text-sm`
+      : `flex ${aspect} w-full max-w-4xl items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.03] px-6 text-center text-sm text-[var(--dp-muted)]`;
 
   if (yt) {
     return (

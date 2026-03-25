@@ -65,13 +65,18 @@ export default async function HomePage() {
           <h2 className={sectionHeadingClass}>Student success</h2>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {config.successVideos.map((videoUrl, i) => (
-              <HeroVideo
+              <div
                 key={`success-${i}`}
-                url={videoUrl}
-                layout="grid"
-                embedTitle={`Student success video ${i + 1}`}
-                placeholderLabel={`Success video ${i + 1}`}
-              />
+                className="mx-auto w-full max-w-[min(100%,280px)] md:max-w-none"
+              >
+                <HeroVideo
+                  url={videoUrl}
+                  layout="grid"
+                  aspectRatio="9:16"
+                  embedTitle={`Student success video ${i + 1}`}
+                  placeholderLabel={`Success video ${i + 1}`}
+                />
+              </div>
             ))}
           </div>
           <div className="mt-10 flex justify-center md:mt-12">
