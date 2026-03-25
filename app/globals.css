@@ -143,6 +143,22 @@ body {
     0 0 48px rgba(255, 255, 255, 0.12);
 }
 
+/* Outline CTA with stronger default glow (e.g. closing “Book a call”) */
+.dp-cta-glow-outline-strong {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.72),
+    0 0 26px rgba(255, 255, 255, 0.18),
+    0 0 56px rgba(255, 255, 255, 0.1),
+    0 0 40px rgba(98, 67, 255, 0.28);
+}
+.dp-cta-glow-outline-strong:hover {
+  box-shadow:
+    0 0 0 1px rgba(98, 67, 255, 0.9),
+    0 0 32px rgba(98, 67, 255, 0.5),
+    0 0 64px rgba(255, 255, 255, 0.16),
+    0 0 80px rgba(98, 67, 255, 0.22);
+}
+
 .dp-cta-glow-secondary {
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.1),

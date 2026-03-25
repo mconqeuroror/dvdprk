@@ -14,6 +14,9 @@ const basicCourseCtaClass =
 const bookCallCtaClass =
   "dp-cta-glow-outline mx-auto inline-flex h-11 w-full max-w-sm origin-center items-center justify-center rounded-full border-2 border-white/90 bg-transparent px-6 text-sm font-bold text-white transition-all duration-300 ease-out hover:scale-[1.02] hover:border-[var(--dp-accent)] hover:bg-white/[0.06] hover:sm:scale-105 sm:mx-0 sm:h-12 sm:w-auto sm:max-w-none sm:min-w-[12rem] sm:px-10 active:scale-[0.98]";
 
+const bookCallCtaStrongGlowClass =
+  "dp-cta-glow-outline-strong mx-auto inline-flex h-11 w-full max-w-sm origin-center items-center justify-center rounded-full border-2 border-white/90 bg-transparent px-6 text-sm font-bold text-white transition-all duration-300 ease-out hover:scale-[1.02] hover:border-[var(--dp-accent)] hover:bg-white/[0.06] hover:sm:scale-105 sm:mx-0 sm:h-12 sm:w-auto sm:max-w-none sm:min-w-[12rem] sm:px-10 active:scale-[0.98]";
+
 const sectionHeadingClass =
   "text-center font-[family-name:var(--font-syne)] text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl";
 
@@ -63,7 +66,7 @@ export default async function HomePage() {
 
         <div className="mx-auto mt-8 flex justify-center px-3 sm:mt-10 sm:px-4">
           <Link href="/basic-course" className={basicCourseCtaClass}>
-            Basic course
+            Join now!
           </Link>
         </div>
 
@@ -87,17 +90,17 @@ export default async function HomePage() {
           </div>
           <div className="mt-8 flex justify-center px-3 sm:mt-10 md:mt-12 sm:px-0">
             <Link href="/basic-course" className={basicCourseCtaClass}>
-              Basic course
+              Join now!
             </Link>
           </div>
         </div>
 
         <div className="mx-auto mt-14 max-w-6xl px-3 sm:mt-16 sm:px-4 md:mt-20">
-          <p className="mx-auto max-w-xl text-center text-base text-[var(--dp-muted)] sm:text-lg">
+          <h2 className="mx-auto max-w-xl text-center font-[family-name:var(--font-syne)] text-lg font-bold leading-snug text-white sm:text-xl md:text-2xl">
             Ready to talk? Book a call and we&apos;ll map your next step.
-          </p>
+          </h2>
           <div className="mt-6 flex justify-center sm:mt-8">
-            <Link href="/book" className={bookCallCtaClass}>
+            <Link href="/book" className={bookCallCtaStrongGlowClass}>
               Book a call
             </Link>
           </div>
