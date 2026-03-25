@@ -48,7 +48,7 @@ export default async function AdminPanelPage({
 
       {sp.saved ? (
         <p className="mt-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-200">
-          Free course module text and order saved to {storageHint}. Media above
+          Basic course module text and order saved to {storageHint}. Media above
           is saved as you upload or click Save link / Remove.
         </p>
       ) : null}
@@ -137,10 +137,10 @@ export default async function AdminPanelPage({
 
       <form action={saveSiteConfigAction} className="mt-10 space-y-4">
         <h2 className="font-[family-name:var(--font-syne)] text-lg font-semibold text-white">
-          Free course modules
+          Basic course modules
         </h2>
         <p className="text-xs text-[var(--dp-muted)]">
-          Shown on <code className="text-white/70">/free-course</code>. Each
+          Shown on <code className="text-white/70">/basic-course</code>. Each
           module: title, optional description (body under the title), then
           video. Video uploads save immediately per slot (by position). After
           you add or remove modules, click Save below first so uploads match

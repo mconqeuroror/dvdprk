@@ -70,14 +70,14 @@ function MobileMenuPortal({
             Home
           </Link>
           <Link
-            href="/free-course"
-            className={`${mobileLinkBase} ${isNavActive(pathname, "/free-course") ? mobileLinkActive : ""}`}
+            href="/basic-course"
+            className={`${mobileLinkBase} ${isNavActive(pathname, "/basic-course") ? mobileLinkActive : ""}`}
             aria-current={
-              isNavActive(pathname, "/free-course") ? "page" : undefined
+              isNavActive(pathname, "/basic-course") ? "page" : undefined
             }
             onClick={onClose}
           >
-            Free course
+            Basic course
           </Link>
           <Link
             href="/book"
@@ -147,13 +147,13 @@ export function SiteHeaderNav() {
           Home
         </Link>
         <Link
-          href="/free-course"
-          className={`${desktopLinkBase} ${isNavActive(pathname, "/free-course") ? desktopLinkActive : ""}`}
+          href="/basic-course"
+          className={`${desktopLinkBase} ${isNavActive(pathname, "/basic-course") ? desktopLinkActive : ""}`}
           aria-current={
-            isNavActive(pathname, "/free-course") ? "page" : undefined
+            isNavActive(pathname, "/basic-course") ? "page" : undefined
           }
         >
-          Free course
+          Basic course
         </Link>
         <Link href="/book" className={ctaClass}>
           Book a call

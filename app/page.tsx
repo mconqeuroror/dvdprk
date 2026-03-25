@@ -8,35 +8,32 @@ import { getSiteConfig } from "@/lib/site-config";
 
 export const dynamic = "force-dynamic";
 
-const freeCourseCtaClass =
+const basicCourseCtaClass =
   "dp-cta-glow-primary mx-auto inline-flex h-11 w-full max-w-sm origin-center items-center justify-center rounded-full bg-[var(--dp-accent)] px-6 text-sm font-bold text-white transition-transform duration-300 ease-out hover:scale-[1.02] hover:sm:scale-110 sm:mx-0 sm:h-12 sm:w-auto sm:max-w-none sm:min-w-[12rem] sm:px-10 active:scale-[0.98]";
 
 const bookCallCtaClass =
   "dp-cta-glow-outline mx-auto inline-flex h-11 w-full max-w-sm origin-center items-center justify-center rounded-full border-2 border-white/90 bg-transparent px-6 text-sm font-bold text-white transition-all duration-300 ease-out hover:scale-[1.02] hover:border-[var(--dp-accent)] hover:bg-white/[0.06] hover:sm:scale-105 sm:mx-0 sm:h-12 sm:w-auto sm:max-w-none sm:min-w-[12rem] sm:px-10 active:scale-[0.98]";
 
 const sectionHeadingClass =
-  "font-[family-name:var(--font-syne)] text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl";
+  "text-center font-[family-name:var(--font-syne)] text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl";
 
 export default async function HomePage() {
   const config = await getSiteConfig();
 
   return (
-    <div className="relative min-h-screen overflow-hidden pt-[calc(5.25rem+env(safe-area-inset-top,0px))] sm:pt-28 md:pt-32">
+    <div className="relative min-h-screen overflow-hidden pt-[max(1.25rem,env(safe-area-inset-top))] sm:pt-10 md:pt-12">
       <PageBackgroundGlow variant="home" />
       {process.env.NODE_ENV === "development" ? <DevScrollGrid /> : null}
 
-      <main className="relative z-[1] min-w-0 pb-16 sm:pb-24">
+      <main className="relative z-[1] min-w-0 pb-16 text-center sm:pb-24">
         <div className="mx-auto max-w-6xl px-3 sm:px-4 md:px-6">
-          <p className="mb-3 font-[family-name:var(--font-syne)] text-[0.65rem] font-semibold uppercase leading-snug tracking-[0.18em] text-white/90 sm:mb-4 sm:text-xs sm:tracking-[0.2em]">
-            Patience · skill · discipline
-          </p>
-          <h1 className="font-[family-name:var(--font-syne)] text-[1.65rem] font-bold leading-[1.08] tracking-tight text-white min-[400px]:text-[1.85rem] sm:text-4xl sm:leading-[1.05] md:text-6xl lg:text-7xl">
+          <h1 className="mx-auto max-w-4xl font-[family-name:var(--font-syne)] text-[1.65rem] font-bold leading-[1.08] tracking-tight text-white min-[400px]:text-[1.85rem] sm:text-4xl sm:leading-[1.05] md:text-6xl lg:text-7xl">
             Build a funded path
             <span className="text-[var(--dp-muted)]"> without the noise.</span>
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-6 sm:text-lg md:text-xl">
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-6 sm:text-lg md:text-xl">
             Clear frameworks, accountability, and a process you can repeat.
-            Start with the free course, then book a call when you&apos;re ready
+            Start with the basic course, then book a call when you&apos;re ready
             to go deeper.
           </p>
 
@@ -44,9 +41,9 @@ export default async function HomePage() {
             <HeroVideo url={config.heroVideoUrl} />
           </div>
 
-          <div className="mx-auto mt-8 flex w-full max-w-4xl flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
-            <Link href="/free-course" className={freeCourseCtaClass}>
-              Get the free course
+          <div className="mx-auto mt-8 flex w-full max-w-4xl flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4">
+            <Link href="/basic-course" className={basicCourseCtaClass}>
+              Basic course
             </Link>
             <Link href="/book" className={bookCallCtaClass}>
               Book a call
@@ -65,8 +62,8 @@ export default async function HomePage() {
         />
 
         <div className="mx-auto mt-8 flex justify-center px-3 sm:mt-10 sm:px-4">
-          <Link href="/free-course" className={freeCourseCtaClass}>
-            Get the free course
+          <Link href="/basic-course" className={basicCourseCtaClass}>
+            Basic course
           </Link>
         </div>
 
@@ -89,8 +86,19 @@ export default async function HomePage() {
             ))}
           </div>
           <div className="mt-8 flex justify-center px-3 sm:mt-10 md:mt-12 sm:px-0">
-            <Link href="/free-course" className={freeCourseCtaClass}>
-              Start free course
+            <Link href="/basic-course" className={basicCourseCtaClass}>
+              Basic course
+            </Link>
+          </div>
+        </div>
+
+        <div className="mx-auto mt-14 max-w-6xl px-3 sm:mt-16 sm:px-4 md:mt-20">
+          <p className="mx-auto max-w-xl text-center text-base text-[var(--dp-muted)] sm:text-lg">
+            Ready to talk? Book a call and we&apos;ll map your next step.
+          </p>
+          <div className="mt-6 flex justify-center sm:mt-8">
+            <Link href="/book" className={bookCallCtaClass}>
+              Book a call
             </Link>
           </div>
         </div>

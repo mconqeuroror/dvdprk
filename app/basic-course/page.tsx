@@ -9,31 +9,31 @@ import { getSiteConfig } from "@/lib/site-config";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Free Forex Training",
+  title: "Basic course",
   description:
-    "Free Forex mini course from David Perk — modules and book a live call.",
+    "Basic Forex mini course from David Perk — modules and book a live call.",
 };
 
-export default async function FreeCoursePage() {
+export default async function BasicCoursePage() {
   const config = await getSiteConfig();
   const modules = config.freeCourseModules;
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden pt-[calc(5.25rem+env(safe-area-inset-top,0px))] sm:pt-28 md:pt-32">
-      <PageBackgroundGlow variant="freeCourse" />
+    <div className="relative min-h-screen overflow-x-hidden pt-[max(1.25rem,env(safe-area-inset-top))] sm:pt-10 md:pt-12">
+      <PageBackgroundGlow variant="basicCourse" />
       {process.env.NODE_ENV === "development" ? <DevScrollGrid /> : null}
-      <main className="relative z-[1] mx-auto min-w-0 max-w-6xl px-3 pb-16 sm:px-4 sm:pb-24 md:px-6">
+      <main className="relative z-[1] mx-auto min-w-0 max-w-6xl px-3 pb-16 text-center sm:px-4 sm:pb-24 md:px-6">
         <h1 className="font-[family-name:var(--font-syne)] pb-[0.2em] text-[1.65rem] font-bold leading-[1.14] tracking-tight text-white min-[400px]:text-[1.85rem] sm:text-4xl sm:leading-[1.12] md:text-6xl md:leading-[1.1] lg:text-7xl lg:leading-[1.1]">
-          Free Forex Training
+          Basic Forex training
         </h1>
-        <p className="mt-5 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-6 sm:text-lg md:text-xl">
-          You&apos;ve just unlocked access to our free Forex mini course.
+        <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-6 sm:text-lg md:text-xl">
+          You&apos;ve just unlocked access to our basic Forex mini course.
         </p>
-        <p className="mt-3 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-4 sm:text-lg md:text-xl">
+        <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-4 sm:text-lg md:text-xl">
           Keep it simple &amp; start with Module 1 and work through in order.
         </p>
 
-        <div className="mt-10 space-y-10 sm:mt-14 sm:space-y-14 md:mt-16 md:space-y-16">
+        <div className="mt-10 space-y-10 text-left sm:mt-14 sm:space-y-14 md:mt-16 md:space-y-16">
           {modules.map((mod, i) => (
             <section key={`module-${i}`}>
               <p className="mx-auto max-w-3xl whitespace-pre-line text-center font-[family-name:var(--font-syne)] text-[1.35rem] font-bold leading-relaxed text-white md:text-[1.52rem]">
@@ -47,7 +47,7 @@ export default async function FreeCoursePage() {
               <div className="mx-auto mt-6 flex w-full min-w-0 max-w-4xl justify-center">
                 <HeroVideo
                   url={mod.videoUrl}
-                  embedTitle={`Free course: ${mod.tag}`}
+                  embedTitle={`Basic course: ${mod.tag}`}
                   placeholderLabel={`${mod.tag} (video)`}
                 />
               </div>

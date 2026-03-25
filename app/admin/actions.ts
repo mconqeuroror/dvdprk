@@ -88,7 +88,7 @@ export async function saveMediaFieldAction(
 
     await writeSiteConfig(config);
     revalidatePath("/");
-    revalidatePath("/free-course");
+    revalidatePath("/basic-course");
     revalidatePath("/admin/panel");
     return { ok: true };
   } catch (e) {
@@ -150,6 +150,6 @@ export async function saveSiteConfigAction(formData: FormData) {
   };
   await writeSiteConfig(config);
   revalidatePath("/");
-  revalidatePath("/free-course");
+  revalidatePath("/basic-course");
   redirect("/admin/panel?saved=1");
 }

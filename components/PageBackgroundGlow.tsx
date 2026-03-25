@@ -6,7 +6,7 @@ const layouts = {
     violet:
       "absolute -right-1/4 bottom-0 h-[min(62vw,260px)] w-[min(62vw,260px)] rounded-full bg-violet-900/50 blur-[64px] sm:h-[420px] sm:w-[420px] sm:blur-[120px]",
   },
-  freeCourse: {
+  basicCourse: {
     accent:
       "absolute -right-[10%] top-[5%] h-[min(78vw,320px)] w-[min(78vw,320px)] rounded-full bg-[var(--dp-accent)] blur-[76px] sm:h-[540px] sm:w-[540px] sm:blur-[132px]",
     violet:

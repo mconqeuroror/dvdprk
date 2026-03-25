@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Syne, DM_Sans } from "next/font/google";
 import "./globals.css";
-import { SiteHeader } from "@/components/SiteHeader";
 
 const syne = Syne({
   variable: "--font-syne",
@@ -21,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s · David Perk",
   },
   description:
-    "Trading education and mentorship — book a call or start with the free course.",
+    "Trading education and mentorship — book a call or start with the basic course.",
   metadataBase: new URL("https://www.davidperk.com"),
 };
 
@@ -41,7 +40,6 @@ export default function RootLayout({
       <body
         className={`${syne.variable} ${dmSans.variable} min-h-screen min-w-0 antialiased`}
       >
-        <SiteHeader />
         {children}
       </body>
     </html>
