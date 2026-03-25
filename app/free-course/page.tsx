@@ -33,10 +33,10 @@ export default async function FreeCoursePage() {
         <div className="mt-10 space-y-10 sm:mt-14 sm:space-y-14 md:mt-16 md:space-y-16">
           {modules.map((mod, i) => (
             <section key={`${i}-${mod.tag.slice(0, 20)}`}>
-              <p className="max-w-3xl whitespace-pre-line text-base leading-relaxed text-white md:text-lg">
+              <p className="mx-auto max-w-3xl whitespace-pre-line text-center font-[family-name:var(--font-syne)] text-[1.35rem] font-bold leading-relaxed text-white md:text-[1.52rem]">
                 {mod.tag}
               </p>
-              <div className="mx-auto mt-6 flex w-full max-w-4xl justify-center">
+              <div className="mx-auto mt-6 flex w-full min-w-0 max-w-4xl justify-center">
                 <HeroVideo
                   url={mod.videoUrl}
                   embedTitle={`Free course: ${mod.tag}`}
