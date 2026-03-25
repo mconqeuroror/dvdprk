@@ -11,7 +11,7 @@ async function isAdmin(): Promise<boolean> {
 
 /**
  * POST multipart/form-data with field `file`.
- * Returns `{ url }` for a public blob URL — paste into hero / sliders / modules / success videos.
+ * Returns `{ url }` for a public blob URL — admin panel writes it to the target field.
  * Requires `BLOB_READ_WRITE_TOKEN` (Vercel Blob). Swap implementation if you use S3/R2.
  */
 export async function POST(request: Request) {
