@@ -1,14 +1,27 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 
-const desktopLink =
+const desktopLinkBase =
   "text-sm text-[var(--dp-muted)] transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--dp-accent)]";
 
-const mobileLink =
+const desktopLinkActive =
+  "text-white underline decoration-2 decoration-[var(--dp-accent)] underline-offset-[7px]";
+
+const mobileLinkBase =
   "block rounded-xl px-4 py-3.5 text-base font-medium text-white/95 transition-colors hover:bg-white/[0.08] active:bg-white/[0.12] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--dp-accent)]";
+
+const mobileLinkActive =
+  "text-white underline decoration-2 decoration-[var(--dp-accent)] underline-offset-[7px]";
+
+function isNavActive(pathname: string | null, href: string): boolean {
+  if (!pathname) return false;
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 const ctaClass =
   "rounded-full bg-[var(--dp-accent)] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
@@ -16,10 +29,12 @@ const ctaClass =
 function MobileMenuPortal({
   open,
   panelId,
+  pathname,
   onClose,
 }: {
   open: boolean;
   panelId: string;
+  pathname: string | null;
   onClose: () => void;
 }) {
   const [mounted, setMounted] = useState(false);
@@ -46,10 +61,22 @@ function MobileMenuPortal({
         }}
       >
         <div className="flex flex-col py-1">
-          <Link href="/" className={mobileLink} onClick={onClose}>
+          <Link
+            href="/"
+            className={`${mobileLinkBase} ${isNavActive(pathname, "/") ? mobileLinkActive : ""}`}
+            aria-current={isNavActive(pathname, "/") ? "page" : undefined}
+            onClick={onClose}
+          >
             Home
           </Link>
-          <Link href="/free-course" className={mobileLink} onClick={onClose}>
+          <Link
+            href="/free-course"
+            className={`${mobileLinkBase} ${isNavActive(pathname, "/free-course") ? mobileLinkActive : ""}`}
+            aria-current={
+              isNavActive(pathname, "/free-course") ? "page" : undefined
+            }
+            onClick={onClose}
+          >
             Free course
           </Link>
           <Link
@@ -67,6 +94,7 @@ function MobileMenuPortal({
 }
 
 export function SiteHeaderNav() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const panelId = useId();
 
@@ -111,10 +139,20 @@ export function SiteHeaderNav() {
         className="hidden items-center gap-5 md:flex md:gap-8"
         aria-label="Primary"
       >
-        <Link href="/" className={desktopLink}>
+        <Link
+          href="/"
+          className={`${desktopLinkBase} ${isNavActive(pathname, "/") ? desktopLinkActive : ""}`}
+          aria-current={isNavActive(pathname, "/") ? "page" : undefined}
+        >
           Home
         </Link>
-        <Link href="/free-course" className={desktopLink}>
+        <Link
+          href="/free-course"
+          className={`${desktopLinkBase} ${isNavActive(pathname, "/free-course") ? desktopLinkActive : ""}`}
+          aria-current={
+            isNavActive(pathname, "/free-course") ? "page" : undefined
+          }
+        >
           Free course
         </Link>
         <Link href="/book" className={ctaClass}>
@@ -122,7 +160,12 @@ export function SiteHeaderNav() {
         </Link>
       </nav>
 
-      <MobileMenuPortal open={open} panelId={panelId} onClose={() => setOpen(false)} />
+      <MobileMenuPortal
+        open={open}
+        panelId={panelId}
+        pathname={pathname}
+        onClose={() => setOpen(false)}
+      />
     </div>
   );
 }
