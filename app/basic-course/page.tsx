@@ -1,12 +1,20 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { CalendlyEmbed } from "@/components/CalendlyEmbed";
 import { HeroVideo } from "@/components/HeroVideo";
 import { DevScrollGrid } from "@/components/DevScrollGrid";
 import { PageBackgroundGlow } from "@/components/PageBackgroundGlow";
 import { SiteFooter } from "@/components/SiteFooter";
+import { WHOP_JOIN_URL } from "@/lib/join-url";
 import { getSiteConfig } from "@/lib/site-config";
 
 export const dynamic = "force-dynamic";
+
+const joinNowCtaClass =
+  "dp-cta-glow-primary mx-auto inline-flex h-11 w-full max-w-sm origin-center items-center justify-center rounded-full bg-[var(--dp-accent)] px-6 text-sm font-bold text-white transition-transform duration-300 ease-out hover:scale-[1.02] hover:sm:scale-110 sm:mx-0 sm:h-12 sm:w-auto sm:max-w-none sm:min-w-[12rem] sm:px-10 active:scale-[0.98]";
+
+const homeCtaClass =
+  "dp-cta-glow-outline mx-auto inline-flex h-11 w-full max-w-sm origin-center items-center justify-center rounded-full border-2 border-white/90 bg-transparent px-6 text-sm font-bold text-white transition-all duration-300 ease-out hover:scale-[1.02] hover:border-[var(--dp-accent)] hover:bg-white/[0.06] hover:sm:scale-105 sm:mx-0 sm:h-12 sm:w-auto sm:max-w-none sm:min-w-[12rem] sm:px-10 active:scale-[0.98]";
 
 export const metadata: Metadata = {
   title: "Basic course",
@@ -53,6 +61,20 @@ export default async function BasicCoursePage() {
               </div>
             </section>
           ))}
+        </div>
+
+        <div className="mx-auto mt-12 flex w-full max-w-md flex-col items-stretch justify-center gap-3 sm:mt-16 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+          <Link href="/" className={homeCtaClass}>
+            Home
+          </Link>
+          <Link
+            href={WHOP_JOIN_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={joinNowCtaClass}
+          >
+            Join now!
+          </Link>
         </div>
 
         <section className="mx-auto mt-14 max-w-4xl sm:mt-20 md:mt-28">
