@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useId, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   FX_WIDGET,
   fxBlueProfileUrl,
@@ -47,7 +48,7 @@ function VerifyOnFxBlue({ href }: { href: string }) {
       rel="noopener noreferrer"
       className="mt-2 inline-block text-[0.7rem] leading-none text-[var(--dp-accent)] hover:underline"
     >
-      Verify <span aria-hidden>↗</span>
+      Verify
     </a>
   );
 }
@@ -85,12 +86,113 @@ function buildMonthMatrix(months: FxBlueMonthPoint[]) {
     const row = byYear.get(m.year)!;
     if (m.month >= 1 && m.month <= 12) row[m.month - 1] = m.return;
   }
-  return Array.from(byYear.entries())
-    .sort((a, b) => b[0] - a[0])
-    .slice(0, 8);
+  return Array.from(byYear.entries()).sort((a, b) => b[0] - a[0]);
 }
 
 const MON = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
+
+const PREVIEW_YEAR_COUNT = 3;
+
+type YearMatrixRow = [number, (number | null)[]];
+
+function MonthlyYearBlocks({ matrix }: { matrix: YearMatrixRow[] }) {
+  return (
+    <>
+      {matrix.map(([year, cells]) => (
+        <div key={year}>
+          <p className="mb-2 text-xs font-semibold text-white">{year}</p>
+          <div className="grid grid-cols-6 gap-x-1 gap-y-2">
+            {cells.map((v, i) => (
+              <div key={i} className="min-w-0 text-center">
+                <div className="text-[0.55rem] uppercase text-[var(--dp-muted)]">
+                  {MON[i]}
+                </div>
+                <div
+                  className={
+                    v === null
+                      ? "mt-0.5 text-[0.65rem] text-white/25"
+                      : v >= 0
+                        ? "mt-0.5 rounded bg-emerald-500/20 px-0.5 py-0.5 text-[0.65rem] font-medium leading-tight text-emerald-200"
+                        : "mt-0.5 rounded bg-red-500/20 px-0.5 py-0.5 text-[0.65rem] font-medium leading-tight text-red-200"
+                  }
+                >
+                  {v === null ? "—" : formatPct(v)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
+function MonthlyAllYearsModal({
+  matrix,
+  verifyUrl,
+  onClose,
+  titleId,
+}: {
+  matrix: YearMatrixRow[];
+  verifyUrl: string;
+  onClose: () => void;
+  titleId: string;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6">
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/80 backdrop-blur-[2px]"
+        aria-label="Close"
+        onClick={onClose}
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="relative z-10 flex max-h-[min(88vh,720px)] w-full max-w-lg flex-col overflow-hidden rounded-[12px] border border-white/[0.1] bg-[#0f1117] shadow-2xl"
+      >
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.08] px-4 py-3 sm:px-5">
+          <h3
+            id={titleId}
+            className="pr-2 font-[family-name:var(--font-dm-sans)] text-sm font-semibold text-white sm:text-base"
+          >
+            All monthly returns
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="shrink-0 rounded-md px-2 py-1 text-lg leading-none text-white/60 transition hover:bg-white/10 hover:text-white"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 sm:px-5">
+          <div className="flex flex-col gap-4">
+            <MonthlyYearBlocks matrix={matrix} />
+          </div>
+        </div>
+        <div className="shrink-0 border-t border-white/[0.08] px-4 py-3 sm:px-5">
+          <VerifyOnFxBlue href={verifyUrl} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function CumulativeChart({ series }: { series: FxBlueCumulativePoint[] }) {
   const areaGradId = `${useId().replace(/:/g, "")}-area`;
@@ -276,39 +378,39 @@ function MonthlyTable({
   months: FxBlueMonthPoint[];
   verifyUrl: string;
 }) {
-  const matrix = buildMonthMatrix(months);
+  const fullMatrix = buildMonthMatrix(months);
+  const previewMatrix = fullMatrix.slice(0, PREVIEW_YEAR_COUNT);
+  const [modalOpen, setModalOpen] = useState(false);
+  const modalTitleId = useId().replace(/:/g, "");
+  const showViewAll = fullMatrix.length > PREVIEW_YEAR_COUNT;
 
   return (
     <div className={`${cardShell} ${DATA_PANEL_MIN_H}`}>
       <p className={captionClass}>Monthly returns</p>
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden">
-        {matrix.map(([year, cells]) => (
-          <div key={year}>
-            <p className="mb-2 text-xs font-semibold text-white">{year}</p>
-            <div className="grid grid-cols-6 gap-x-1 gap-y-2">
-              {cells.map((v, i) => (
-                <div key={i} className="min-w-0 text-center">
-                  <div className="text-[0.55rem] uppercase text-[var(--dp-muted)]">
-                    {MON[i]}
-                  </div>
-                  <div
-                    className={
-                      v === null
-                        ? "mt-0.5 text-[0.65rem] text-white/25"
-                        : v >= 0
-                          ? "mt-0.5 rounded bg-emerald-500/20 px-0.5 py-0.5 text-[0.65rem] font-medium leading-tight text-emerald-200"
-                          : "mt-0.5 rounded bg-red-500/20 px-0.5 py-0.5 text-[0.65rem] font-medium leading-tight text-red-200"
-                    }
-                  >
-                    {v === null ? "—" : formatPct(v)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+        <MonthlyYearBlocks matrix={previewMatrix} />
       </div>
+      {showViewAll ? (
+        <button
+          type="button"
+          onClick={() => setModalOpen(true)}
+          className="mt-3 w-full rounded-lg border border-white/[0.12] bg-white/[0.04] py-2 text-center text-xs font-medium text-white/90 transition hover:bg-white/[0.08]"
+        >
+          View all years
+        </button>
+      ) : null}
       <VerifyOnFxBlue href={verifyUrl} />
+      {modalOpen
+        ? createPortal(
+            <MonthlyAllYearsModal
+              matrix={fullMatrix}
+              verifyUrl={verifyUrl}
+              onClose={() => setModalOpen(false)}
+              titleId={modalTitleId}
+            />,
+            document.body,
+          )
+        : null}
     </div>
   );
 }
@@ -474,33 +576,6 @@ export function FxBlueTrackRecord() {
         Inspect track record of my forex live account.
       </p>
 
-      <div className="mx-auto mt-5 max-w-3xl rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-left text-sm leading-relaxed text-[var(--dp-muted)]">
-        <p>
-          <strong className="text-white/90">Why these numbers?</strong> Balance
-          and equity move with{" "}
-          <strong className="text-white/85">deposits and withdrawals</strong>,
-          not just trading — a lower balance can mean cash was taken out, not
-          that the strategy “lost” that amount. For performance, focus on{" "}
-          <strong className="text-white/85">closed profit</strong>, the{" "}
-          <strong className="text-white/85">cumulative profit</strong> curve, and{" "}
-          <strong className="text-white/85">monthly return %</strong>.
-        </p>
-        <p className="mt-2">
-          <strong className="text-white/90">Trust &amp; verification:</strong>{" "}
-          Data is read from the same public{" "}
-          <a
-            href={profileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[var(--dp-accent)] underline-offset-2 hover:underline"
-          >
-            FX Blue
-          </a>{" "}
-          widgets. Tap <strong className="text-white/85">Verify ↗</strong> on any
-          card to open the official widget and compare.
-        </p>
-      </div>
-
       {!payload && !loadError ? (
         <div className="mx-auto mt-9 grid w-full max-w-6xl animate-pulse grid-cols-1 gap-6 md:grid-cols-3">
           <div className="order-2 h-64 rounded-[10px] bg-white/[0.06] md:order-1 md:h-[320px]" />
@@ -539,6 +614,33 @@ export function FxBlueTrackRecord() {
           You can still verify each metric with the links above.
         </p>
       ) : null}
+
+      <div className="mx-auto mt-8 max-w-3xl rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-left text-[0.7rem] leading-snug text-[var(--dp-muted)] sm:mt-10 sm:px-4 sm:text-[0.75rem] sm:leading-relaxed">
+        <p>
+          <strong className="text-white/80">Why these numbers?</strong> Balance
+          and equity move with{" "}
+          <strong className="text-white/75">deposits and withdrawals</strong>,
+          not just trading — a lower balance can mean cash was taken out, not
+          that the strategy “lost” that amount. For performance, focus on{" "}
+          <strong className="text-white/75">closed profit</strong>, the{" "}
+          <strong className="text-white/75">cumulative profit</strong> curve, and{" "}
+          <strong className="text-white/75">monthly return %</strong>.
+        </p>
+        <p className="mt-1.5 sm:mt-2">
+          <strong className="text-white/80">Trust and verification:</strong> Data
+          is read from the same public{" "}
+          <a
+            href={profileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[var(--dp-accent)] underline-offset-2 hover:underline"
+          >
+            FX Blue
+          </a>{" "}
+          widgets. Use the <strong className="text-white/75">Verify</strong> link
+          on each card to open the official widget and compare.
+        </p>
+      </div>
     </section>
   );
 }
