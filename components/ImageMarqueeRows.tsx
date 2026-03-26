@@ -1,3 +1,5 @@
+"use client";
+
 type ImageMarqueeRowsProps = {
   row1: string[];
   row2: string[];

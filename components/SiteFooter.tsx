@@ -1,3 +1,5 @@
+"use client";
+
 import { SocialFooterIcons } from "@/components/SocialFooterIcons";
 
 export function SiteFooter() {

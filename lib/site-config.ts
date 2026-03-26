@@ -5,6 +5,11 @@
 import type { Prisma } from "@prisma/client";
 import fs from "fs/promises";
 import path from "path";
+import {
+  parseFunnelPages,
+  type FunnelPages,
+} from "@/lib/funnel-types";
+import { WHOP_JOIN_URL } from "@/lib/join-url";
 import { hasDatabaseUrl, prisma } from "@/lib/prisma";
 
 export type FreeCourseModule = {
@@ -31,6 +36,11 @@ export type SiteConfig = {
   sliderRow2: string[];
   successVideos: string[];
   freeCourseModules: FreeCourseModule[];
+  /**
+   * Optional block-based funnel for /, /basic-course, /book.
+   * When absent or invalid, layouts fall back to legacy fields via defaults.
+   */
+  funnelPages?: FunnelPages | null;
 };
 
 const CONFIG_PATH = path.join(process.cwd(), "data", "site-config.json");
@@ -58,6 +68,7 @@ const DEFAULTS: SiteConfig = {
   sliderRow2: Array(10).fill(""),
   successVideos: ["", "", ""],
   freeCourseModules: DEFAULT_FREE_MODULES.map((m) => ({ ...m })),
+  funnelPages: null,
 };
 
 function cloneDefaults(): SiteConfig {
@@ -68,7 +79,173 @@ function cloneDefaults(): SiteConfig {
     sliderRow2: [...DEFAULTS.sliderRow2],
     successVideos: [...DEFAULTS.successVideos],
     freeCourseModules: DEFAULT_FREE_MODULES.map((m) => ({ ...m })),
+    funnelPages: null,
   };
+}
+
+export function defaultFunnelPagesFromLegacy(c: SiteConfig): FunnelPages {
+  return {
+    home: [
+      {
+        id: "h-hero",
+        type: "homeHero",
+        titlePrimary: c.homeHeroTitlePrimary,
+        titleMuted: c.homeHeroTitleMuted,
+        description: c.homeHeroDescription,
+      },
+      { id: "h-video", type: "heroVideoSlot" },
+      {
+        id: "h-ctas-top",
+        type: "ctaRow",
+        items: [
+          { label: "Join now!", href: "/basic-course", variant: "primary" },
+          { label: "Book a call", href: "/book", variant: "outline" },
+        ],
+      },
+      {
+        id: "h-results-intro",
+        type: "studentResultsIntro",
+        heading: c.homeStudentResultsHeading,
+        subtext: c.homeStudentResultsSubtext,
+      },
+      { id: "h-marquee", type: "imageMarqueeSlot" },
+      { id: "h-fxblue", type: "fxBlueTrackRecord" },
+      {
+        id: "h-whop",
+        type: "externalCta",
+        label: "Join now!",
+        href: WHOP_JOIN_URL,
+        variant: "primary",
+      },
+      {
+        id: "h-success-title",
+        type: "studentSuccessSection",
+        heading: "Student success",
+      },
+      {
+        id: "h-book-close",
+        type: "bookPromptClosing",
+        heading:
+          "Ready to talk? Book a call and we'll map your next step.",
+        ctaLabel: "Book a call",
+        ctaHref: "/book",
+        ctaVariant: "outlineStrong",
+      },
+    ],
+    basicCourse: [
+      {
+        id: "bc-head",
+        type: "basicCourseHeader",
+        title: "Basic Forex training",
+        intro1:
+          "You've just unlocked access to our basic Forex mini course.",
+        intro2:
+          "Keep it simple & start with Module 1 and work through in order.",
+      },
+      { id: "bc-modules", type: "freeCourseModulesSlot" },
+      {
+        id: "bc-foot-ctas",
+        type: "ctaRow",
+        items: [
+          { label: "Home", href: "/", variant: "outline" },
+          {
+            label: "Join now!",
+            href: WHOP_JOIN_URL,
+            variant: "primary",
+          },
+        ],
+      },
+      {
+        id: "bc-cal",
+        type: "calendlySection",
+        heading: "Want to learn more?",
+        description: "Book a live call with David below",
+        minHeight: 760,
+      },
+    ],
+    book: [
+      {
+        id: "bk-back",
+        type: "bookBackLink",
+        label: "← Back to home",
+        href: "/",
+      },
+      {
+        id: "bk-head",
+        type: "bookHeader",
+        title: "Book a call",
+        description:
+          "Pick a time that works for you. The widget uses your Calendly colors.",
+      },
+      { id: "bk-cal", type: "calendlyEmbed", minHeight: 800 },
+    ],
+  };
+}
+
+export function getFunnelPages(config: SiteConfig): FunnelPages {
+  const parsed = config.funnelPages
+    ? parseFunnelPages(config.funnelPages)
+    : null;
+  if (parsed) return parsed;
+  return defaultFunnelPagesFromLegacy(config);
+}
+
+/** Copy hero + student-results text from home blocks into legacy keys (for media panel / fallbacks). */
+/** When legacy “home copy” form is saved, push values into stored funnel blocks (if any). */
+export function mergeLegacyHomeCopyIntoFunnelPages(
+  config: SiteConfig,
+): SiteConfig {
+  if (config.funnelPages == null) return config;
+  const parsed = parseFunnelPages(config.funnelPages);
+  if (!parsed) return config;
+  const home = parsed.home.map((b) => {
+    if (b.type === "homeHero") {
+      return {
+        ...b,
+        titlePrimary: config.homeHeroTitlePrimary,
+        titleMuted: config.homeHeroTitleMuted,
+        description: config.homeHeroDescription,
+      };
+    }
+    if (b.type === "studentResultsIntro") {
+      return {
+        ...b,
+        heading: config.homeStudentResultsHeading,
+        subtext: config.homeStudentResultsSubtext,
+      };
+    }
+    return b;
+  });
+  return {
+    ...config,
+    funnelPages: { ...parsed, home },
+  };
+}
+
+export function syncLegacyCopyFromHomeFunnel(config: SiteConfig): SiteConfig {
+  const pages = getFunnelPages(config);
+  let next = { ...config };
+  for (const b of pages.home) {
+    if (b.hidden) continue;
+    if (b.type === "homeHero") {
+      next = {
+        ...next,
+        homeHeroTitlePrimary:
+          b.titlePrimary.trim() || next.homeHeroTitlePrimary,
+        homeHeroTitleMuted: b.titleMuted,
+        homeHeroDescription: b.description.trim() || next.homeHeroDescription,
+      };
+    }
+    if (b.type === "studentResultsIntro") {
+      next = {
+        ...next,
+        homeStudentResultsHeading:
+          b.heading.trim() || next.homeStudentResultsHeading,
+        homeStudentResultsSubtext: b.subtext.trim(),
+      };
+    }
+  }
+  return next;
 }
 
 function pad10(arr: unknown): string[] {
@@ -119,6 +296,12 @@ function normalizeFromUnknown(parsed: unknown): SiteConfig {
     p.homeStudentResultsSubtext === null
       ? DEFAULT_STUDENT_RESULTS_SUBTEXT
       : String(p.homeStudentResultsSubtext).trim();
+  const funnelRaw = p.funnelPages;
+  const funnelParsed =
+    funnelRaw === null || funnelRaw === undefined
+      ? null
+      : parseFunnelPages(funnelRaw);
+
   return {
     heroVideoUrl: String(p.heroVideoUrl ?? ""),
     homeHeroTitlePrimary: primary || DEFAULTS.homeHeroTitlePrimary,
@@ -131,6 +314,7 @@ function normalizeFromUnknown(parsed: unknown): SiteConfig {
     sliderRow2: pad10(p.sliderRow2),
     successVideos: pad3(p.successVideos),
     freeCourseModules: normalizeFreeCourseModules(p.freeCourseModules),
+    funnelPages: funnelParsed ?? null,
   };
 }
 
@@ -180,6 +364,10 @@ export async function writeSiteConfig(config: SiteConfig): Promise<void> {
     sliderRow2: pad10(config.sliderRow2),
     successVideos: pad3(config.successVideos),
     freeCourseModules: normalizeFreeCourseModules(config.freeCourseModules),
+    funnelPages:
+      config.funnelPages != null && parseFunnelPages(config.funnelPages)
+        ? config.funnelPages
+        : null,
   };
 
   const payload = normalized as unknown as Prisma.InputJsonValue;

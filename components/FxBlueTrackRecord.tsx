@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * FX Blue charts render inside third-party iframes. Card shell, padding, borders,
  * and captions are ours; gridlines, table colors, row hovers, and in-widget typography

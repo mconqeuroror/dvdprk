@@ -1,3 +1,5 @@
+"use client";
+
 /** Dual-orb backgrounds; smaller on narrow viewports to reduce overflow and paint cost. */
 const layouts = {
   home: {

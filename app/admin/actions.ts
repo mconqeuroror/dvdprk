@@ -7,10 +7,13 @@ import {
   isAdminSession,
   setAdminSession,
 } from "@/lib/admin-session";
+import { parseFunnelPages } from "@/lib/funnel-types";
 import { validateAdminLoginAsync } from "@/lib/validate-admin-login";
 import {
   getSiteConfig,
+  mergeLegacyHomeCopyIntoFunnelPages,
   normalizeFreeCourseModules,
+  syncLegacyCopyFromHomeFunnel,
   writeSiteConfig,
   type FreeCourseModule,
   type SiteConfig,
@@ -89,6 +92,7 @@ export async function saveMediaFieldAction(
     await writeSiteConfig(config);
     revalidatePath("/");
     revalidatePath("/basic-course");
+    revalidatePath("/book");
     revalidatePath("/admin/panel");
     return { ok: true };
   } catch (e) {
@@ -144,7 +148,7 @@ export async function saveSiteConfigAction(formData: FormData) {
     freeCourseModules = current.freeCourseModules;
   }
 
-  const config: SiteConfig = {
+  let config: SiteConfig = {
     ...current,
     homeHeroTitlePrimary: String(
       formData.get("homeHeroTitlePrimary") ?? "",
@@ -161,8 +165,41 @@ export async function saveSiteConfigAction(formData: FormData) {
     ).trim(),
     freeCourseModules: normalizeFreeCourseModules(freeCourseModules),
   };
+  config = mergeLegacyHomeCopyIntoFunnelPages(config);
   await writeSiteConfig(config);
   revalidatePath("/");
   revalidatePath("/basic-course");
+  revalidatePath("/book");
+  revalidatePath("/admin/funnel");
   redirect("/admin/panel?saved=1");
+}
+
+export async function saveFunnelPagesAction(formData: FormData) {
+  if (!(await isAdminSession())) {
+    redirect("/admin");
+  }
+
+  const current = await getSiteConfig();
+  const raw = String(formData.get("funnelPagesJson") ?? "").trim();
+  let parsedJson: unknown;
+  try {
+    parsedJson = JSON.parse(raw || "{}");
+  } catch {
+    redirect("/admin/funnel?error=parse");
+  }
+
+  const fp = parseFunnelPages(parsedJson);
+  if (!fp) {
+    redirect("/admin/funnel?error=invalid");
+  }
+
+  let next: SiteConfig = { ...current, funnelPages: fp };
+  next = syncLegacyCopyFromHomeFunnel(next);
+  await writeSiteConfig(next);
+  revalidatePath("/");
+  revalidatePath("/basic-course");
+  revalidatePath("/book");
+  revalidatePath("/admin/panel");
+  revalidatePath("/admin/funnel");
+  redirect("/admin/funnel?saved=1");
 }

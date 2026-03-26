@@ -1,20 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { CalendlyEmbed } from "@/components/CalendlyEmbed";
-import { HeroVideo } from "@/components/HeroVideo";
 import { DevScrollGrid } from "@/components/DevScrollGrid";
+import { FunnelBlocksRenderer } from "@/components/funnel/FunnelBlocksRenderer";
 import { PageBackgroundGlow } from "@/components/PageBackgroundGlow";
 import { SiteFooter } from "@/components/SiteFooter";
-import { WHOP_JOIN_URL } from "@/lib/join-url";
-import { getSiteConfig } from "@/lib/site-config";
+import { visibleBlocks } from "@/lib/funnel-types";
+import { getFunnelPages, getSiteConfig } from "@/lib/site-config";
 
 export const dynamic = "force-dynamic";
-
-const joinNowCtaClass =
-  "dp-cta-glow-primary mx-auto inline-flex h-11 w-full max-w-sm origin-center items-center justify-center rounded-full bg-[var(--dp-accent)] px-6 text-sm font-bold text-white transition-transform duration-300 ease-out hover:scale-[1.02] hover:sm:scale-110 sm:mx-0 sm:h-12 sm:w-auto sm:max-w-none sm:min-w-[12rem] sm:px-10 active:scale-[0.98]";
-
-const homeCtaClass =
-  "dp-cta-glow-outline mx-auto inline-flex h-11 w-full max-w-sm origin-center items-center justify-center rounded-full border-2 border-white/90 bg-transparent px-6 text-sm font-bold text-white transition-all duration-300 ease-out hover:scale-[1.02] hover:border-[var(--dp-accent)] hover:bg-white/[0.06] hover:sm:scale-105 sm:mx-0 sm:h-12 sm:w-auto sm:max-w-none sm:min-w-[12rem] sm:px-10 active:scale-[0.98]";
 
 export const metadata: Metadata = {
   title: "Basic course",
@@ -24,71 +16,17 @@ export const metadata: Metadata = {
 
 export default async function BasicCoursePage() {
   const config = await getSiteConfig();
-  const modules = config.freeCourseModules;
+  const blocks = visibleBlocks(getFunnelPages(config).basicCourse);
 
   return (
     <div className="relative min-h-screen pt-[max(1.25rem,env(safe-area-inset-top))] sm:pt-10 md:pt-12">
       <PageBackgroundGlow variant="basicCourse" />
       {process.env.NODE_ENV === "development" ? <DevScrollGrid /> : null}
-      <main className="relative z-[1] mx-auto min-w-0 max-w-6xl px-3 pb-16 text-center sm:px-4 sm:pb-24 md:px-6">
-        <h1 className="transform-gpu pb-4 font-[family-name:var(--font-syne)] text-[1.65rem] font-bold leading-normal tracking-tight text-white min-[400px]:text-[1.85rem] sm:pb-5 sm:text-4xl md:pb-8 md:text-6xl md:leading-[1.35] lg:text-7xl lg:leading-[1.32] after:block after:h-2 after:content-[''] sm:after:h-2.5 md:after:h-3">
-          Basic Forex training
-        </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-6 sm:text-lg md:text-xl">
-          You&apos;ve just unlocked access to our basic Forex mini course.
-        </p>
-        <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-4 sm:text-lg md:text-xl">
-          Keep it simple &amp; start with Module 1 and work through in order.
-        </p>
-
-        <div className="mt-10 space-y-10 text-left sm:mt-14 sm:space-y-14 md:mt-16 md:space-y-16">
-          {modules.map((mod, i) => (
-            <section key={`module-${i}`}>
-              <p className="mx-auto max-w-3xl whitespace-pre-line text-center font-[family-name:var(--font-syne)] text-[1.35rem] font-bold leading-relaxed text-white md:text-[1.52rem]">
-                {mod.tag}
-              </p>
-              {mod.description.trim() ? (
-                <p className="mx-auto mt-4 max-w-3xl whitespace-pre-line text-center text-base leading-relaxed text-[var(--dp-muted)] sm:text-lg">
-                  {mod.description}
-                </p>
-              ) : null}
-              <div className="mx-auto mt-6 flex w-full min-w-0 max-w-4xl justify-center">
-                <HeroVideo
-                  url={mod.videoUrl}
-                  embedTitle={`Basic course: ${mod.tag}`}
-                  placeholderLabel={`${mod.tag} (video)`}
-                />
-              </div>
-            </section>
-          ))}
-        </div>
-
-        <div className="mx-auto mt-12 flex w-full max-w-md flex-col items-stretch justify-center gap-3 sm:mt-16 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-          <Link href="/" className={homeCtaClass}>
-            Home
-          </Link>
-          <Link
-            href={WHOP_JOIN_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={joinNowCtaClass}
-          >
-            Join now!
-          </Link>
-        </div>
-
-        <section className="mx-auto mt-14 max-w-4xl sm:mt-20 md:mt-28">
-          <h2 className="text-center font-[family-name:var(--font-syne)] text-lg font-bold uppercase tracking-[0.1em] text-white sm:text-xl sm:tracking-[0.12em] md:text-2xl">
-            Want to learn more?
-          </h2>
-          <p className="mt-3 text-center text-base text-[var(--dp-muted)] sm:mt-4 sm:text-lg md:text-xl">
-            Book a live call with David below
-          </p>
-          <div className="mt-6 sm:mt-8">
-            <CalendlyEmbed minHeight={760} />
-          </div>
-        </section>
-      </main>
+      <FunnelBlocksRenderer
+        page="basicCourse"
+        blocks={blocks}
+        config={config}
+      />
       <SiteFooter />
     </div>
   );

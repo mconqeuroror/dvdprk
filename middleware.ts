@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith("/admin/panel")) {
+  const pathname = request.nextUrl.pathname;
+  if (
+    pathname.startsWith("/admin/panel") ||
+    pathname.startsWith("/admin/funnel")
+  ) {
     const ok = request.cookies.get("dp_admin")?.value === "1";
     if (!ok) {
       return NextResponse.redirect(new URL("/admin", request.url));
@@ -12,5 +16,10 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/panel", "/admin/panel/"],
+  matcher: [
+    "/admin/panel",
+    "/admin/panel/:path*",
+    "/admin/funnel",
+    "/admin/funnel/:path*",
+  ],
 };

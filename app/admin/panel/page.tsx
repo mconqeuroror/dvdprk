@@ -28,7 +28,13 @@ export default async function AdminPanelPage({
         <h1 className="font-[family-name:var(--font-syne)] text-2xl font-bold text-white">
           Admin panel
         </h1>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/admin/funnel"
+            className="text-sm text-[var(--dp-accent)] hover:underline"
+          >
+            Funnel editor
+          </Link>
           <Link
             href="/"
             className="text-sm text-[var(--dp-muted)] hover:text-white"

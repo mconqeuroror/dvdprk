@@ -1,3 +1,5 @@
+"use client";
+
 import { getYoutubeEmbedUrl } from "@/lib/video-embed";
 
 type HeroVideoProps = {
