@@ -11,6 +11,24 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        dp: {
+          bg: "var(--dp-bg)",
+          surface: "var(--dp-surface)",
+          card: "var(--dp-card)",
+          accent: "var(--dp-accent)",
+          muted: "var(--dp-muted)",
+        },
+      },
+      borderColor: {
+        dp: "var(--dp-border)",
+        "dp-strong": "var(--dp-border-strong)",
+        "dp-subtle": "var(--dp-border-subtle)",
+      },
+      ringColor: {
+        dp: "var(--dp-ring)",
+      },
+      boxShadow: {
+        "dp-elevated": "var(--dp-shadow-elevated)",
       },
     },
   },

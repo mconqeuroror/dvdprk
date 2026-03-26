@@ -22,6 +22,21 @@ export const metadata: Metadata = {
   description:
     "Trading education and mentorship — book a call or start with the basic course.",
   metadataBase: new URL("https://www.davidperk.com"),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "David Perk",
+    title: "David Perk",
+    description:
+      "Trading education and mentorship — book a call or start with the basic course.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "David Perk",
+    description:
+      "Trading education and mentorship — book a call or start with the basic course.",
+  },
+  robots: { index: true, follow: true },
 };
 
 export const viewport = {

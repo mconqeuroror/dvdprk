@@ -6,12 +6,10 @@ import { CalendlyEmbed } from "@/components/CalendlyEmbed";
 import { FxBlueTrackRecord } from "@/components/FxBlueTrackRecord";
 import { HeroVideo } from "@/components/HeroVideo";
 import { ImageMarqueeRows } from "@/components/ImageMarqueeRows";
+import { DP_SECTION_HEADING } from "@/lib/dp-design";
 import type { CtaItem, FunnelBlock, FunnelPageId } from "@/lib/funnel-types";
 import type { SiteConfig } from "@/lib/site-config";
 import { funnelCtaClass, FUNNEL_CTA_OUTLINE_STRONG } from "./funnelCtaClasses";
-
-const sectionHeadingClass =
-  "text-center font-[family-name:var(--font-syne)] text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl";
 
 function CtaLink({ item }: { item: CtaItem }) {
   const cls = funnelCtaClass(item.variant);
@@ -101,7 +99,7 @@ function renderBlock(
           key={block.id}
           className="mx-auto mt-12 max-w-6xl px-3 sm:mt-16 sm:px-4 md:mt-20 md:px-6"
         >
-          <h2 className={sectionHeadingClass}>{block.heading}</h2>
+          <h2 className={DP_SECTION_HEADING}>{block.heading}</h2>
           {block.subtext.trim() ? (
             <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-4 sm:text-lg">
               {block.subtext}
@@ -152,7 +150,7 @@ function renderBlock(
           key={block.id}
           className="mx-auto mt-14 max-w-6xl px-3 sm:mt-20 sm:px-4 md:mt-24 md:px-6"
         >
-          <h2 className={sectionHeadingClass}>{block.heading}</h2>
+          <h2 className={DP_SECTION_HEADING}>{block.heading}</h2>
           <div className="mt-6 grid grid-cols-1 gap-5 sm:mt-8 sm:gap-6 md:grid-cols-3">
             {config.successVideos.map((videoUrl, i) => (
               <div

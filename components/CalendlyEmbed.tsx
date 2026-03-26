@@ -44,7 +44,7 @@ export function CalendlyEmbed({
     >
       {!src ? (
         <div
-          className="flex w-full items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-sm text-[var(--dp-muted)] sm:rounded-[14px]"
+          className="flex w-full items-center justify-center rounded-xl border border-dp bg-white/[0.04] text-sm text-[var(--dp-muted)] sm:rounded-[14px]"
           style={{ minHeight: frameH }}
           aria-hidden
         >

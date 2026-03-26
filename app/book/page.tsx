@@ -11,6 +11,14 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Book a call",
   description: "Schedule a call with David Perk via Calendly.",
+  openGraph: {
+    title: "Book a call",
+    description: "Schedule a call with David Perk via Calendly.",
+  },
+  twitter: {
+    title: "Book a call",
+    description: "Schedule a call with David Perk via Calendly.",
+  },
 };
 
 export default async function BookPage() {

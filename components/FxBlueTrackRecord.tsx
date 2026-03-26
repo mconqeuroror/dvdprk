@@ -14,6 +14,7 @@ import type {
   FxBlueCumulativePoint,
   FxBlueMonthPoint,
 } from "@/lib/fxblue/parse-html";
+import { DP_SECTION_HEADING } from "@/lib/dp-design";
 
 type ApiPayload = {
   publisherId: string;
@@ -27,17 +28,14 @@ type ApiPayload = {
   errors: string[];
 };
 
-const sectionHeadingClass =
-  "text-center font-[family-name:var(--font-syne)] text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl";
-
 const cardShell =
-  "rounded-[10px] border border-solid border-[rgba(255,255,255,0.08)] bg-[#0f1117] p-5 font-[family-name:var(--font-dm-sans)] md:p-6";
+  "rounded-[var(--dp-radius-sm)] border border-solid border-[var(--dp-border-subtle)] bg-[var(--dp-card)] p-5 font-[family-name:var(--font-dm-sans)] md:p-6";
 
 const captionClass =
-  "mb-3 text-[11px] font-medium uppercase leading-snug tracking-[0.1em] text-[rgba(243,240,254,0.5)] md:mb-4 md:text-xs";
+  "mb-3 text-[11px] font-medium uppercase leading-snug tracking-[0.1em] text-[var(--dp-muted-soft)] md:mb-4 md:text-xs";
 
 const viewMonthlyResultsButtonClass =
-  "rounded-full border border-white/[0.14] bg-white/[0.06] px-8 py-2.5 text-sm font-medium text-white/95 shadow-sm transition hover:bg-white/[0.1] focus-visible:outline focus-visible:ring-2 focus-visible:ring-[var(--dp-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0c]";
+  "rounded-full border border-dp-strong bg-white/[0.06] px-8 py-2.5 text-sm font-medium text-white/95 shadow-sm transition hover:bg-white/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--dp-bg)] motion-reduce:transition-none";
 
 let fxBlueBodyScrollLocks = 0;
 function lockFxBlueBodyScroll() {
@@ -994,7 +992,7 @@ export function FxBlueTrackRecord() {
     >
       <h2
         id="fx-track-record-heading"
-        className={sectionHeadingClass}
+        className={DP_SECTION_HEADING}
       >
         Expertise backed by years of data
       </h2>

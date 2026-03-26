@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { DevScrollGrid } from "@/components/DevScrollGrid";
 import { FunnelBlocksRenderer } from "@/components/funnel/FunnelBlocksRenderer";
 import { PageBackgroundGlow } from "@/components/PageBackgroundGlow";
@@ -6,6 +7,17 @@ import { visibleBlocks } from "@/lib/funnel-types";
 import { getFunnelPages, getSiteConfig } from "@/lib/site-config";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Home",
+  description:
+    "Forex trading education and mentorship — verified track record, student results, and ways to work with David Perk.",
+  openGraph: {
+    title: "Home",
+    description:
+      "Forex trading education and mentorship — verified track record, student results, and ways to work with David Perk.",
+  },
+};
 
 export default async function HomePage() {
   const config = await getSiteConfig();

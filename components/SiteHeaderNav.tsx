@@ -6,13 +6,13 @@ import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 
 const desktopLinkBase =
-  "text-sm text-[var(--dp-muted)] transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--dp-accent)]";
+  "text-sm text-[var(--dp-muted)] transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--dp-bg)] rounded-sm";
 
 const desktopLinkActive =
   "text-white underline decoration-2 decoration-[var(--dp-accent)] underline-offset-[7px]";
 
 const mobileLinkBase =
-  "block rounded-xl px-4 py-3.5 text-base font-medium text-white/95 transition-colors hover:bg-white/[0.08] active:bg-white/[0.12] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--dp-accent)]";
+  "block rounded-xl px-4 py-3.5 text-base font-medium text-white/95 transition-colors hover:bg-white/[0.08] active:bg-white/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--dp-bg)]";
 
 const mobileLinkActive =
   "text-white underline decoration-2 decoration-[var(--dp-accent)] underline-offset-[7px]";
@@ -24,7 +24,7 @@ function isNavActive(pathname: string | null, href: string): boolean {
 }
 
 const ctaClass =
-  "rounded-full bg-[var(--dp-accent)] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+  "rounded-full bg-[var(--dp-accent)] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--dp-bg)]";
 
 function MobileMenuPortal({
   open,
@@ -81,7 +81,7 @@ function MobileMenuPortal({
           </Link>
           <Link
             href="/book"
-            className="mx-2 mt-1 flex h-12 items-center justify-center rounded-full bg-[var(--dp-accent)] px-4 text-sm font-semibold text-white hover:opacity-95"
+            className="mx-2 mt-1 flex h-12 items-center justify-center rounded-full bg-[var(--dp-accent)] px-4 text-sm font-semibold text-white hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--dp-bg)]"
             onClick={onClose}
           >
             Book a call
@@ -116,7 +116,7 @@ export function SiteHeaderNav() {
     <div className="flex items-center gap-2 md:gap-0">
       <button
         type="button"
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/15 bg-white/[0.06] text-white md:hidden"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dp-strong bg-white/[0.06] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--dp-bg)] md:hidden"
         aria-expanded={open}
         aria-controls={panelId}
         aria-label={open ? "Close menu" : "Open menu"}

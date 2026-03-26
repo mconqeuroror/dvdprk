@@ -12,6 +12,16 @@ export const metadata: Metadata = {
   title: "Basic course",
   description:
     "Basic Forex mini course from David Perk — modules and book a live call.",
+  openGraph: {
+    title: "Basic course",
+    description:
+      "Basic Forex mini course from David Perk — modules and book a live call.",
+  },
+  twitter: {
+    title: "Basic course",
+    description:
+      "Basic Forex mini course from David Perk — modules and book a live call.",
+  },
 };
 
 export default async function BasicCoursePage() {

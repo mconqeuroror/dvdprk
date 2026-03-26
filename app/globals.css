@@ -14,10 +14,23 @@ html {
 :root {
   --dp-bg: #010409;
   --dp-surface: #14113a;
+  --dp-card: #0f1117;
   --dp-accent: #6243ff;
+  --dp-accent-rgb: 98, 67, 255;
   --dp-accent-soft: rgba(98, 67, 255, 0.1);
   --dp-text: #f3f0fe;
   --dp-muted: rgba(243, 240, 254, 0.65);
+  --dp-muted-soft: rgba(243, 240, 254, 0.5);
+  --dp-border: rgba(255, 255, 255, 0.1);
+  --dp-border-subtle: rgba(255, 255, 255, 0.06);
+  --dp-border-strong: rgba(255, 255, 255, 0.14);
+  --dp-border-inset: rgba(255, 255, 255, 0.12);
+  /* Focus ring: visible on dark bg without harsh white */
+  --dp-ring: rgba(200, 190, 255, 0.65);
+  --dp-shadow-elevated: 0 16px 48px rgba(0, 0, 0, 0.45);
+  --dp-radius-sm: 10px;
+  --dp-radius-md: 14px;
+  --dp-radius-nav: 18px;
 }
 
 body {
@@ -45,11 +58,11 @@ body {
 /* Glass nav bar + soft glow that travels along the perimeter */
 .glass-nav-shell {
   position: relative;
-  border-radius: 18px;
+  border-radius: var(--dp-radius-nav);
   background: var(--dp-accent-soft) !important;
   -webkit-backdrop-filter: blur(16px) saturate(1.25);
   backdrop-filter: blur(16px) saturate(1.25);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 var(--dp-border-inset);
   isolation: isolate;
   overflow: visible;
 }
@@ -117,8 +130,8 @@ body {
 }
 
 .calendly-inline-widget {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--dp-border-strong);
+  box-shadow: var(--dp-shadow-elevated);
 }
 
 /* Hero CTAs — edge glow + hover scale handled in Tailwind on the link */
@@ -205,3 +218,15 @@ body {
 }
 
 /* Don’t change duration on hover — it resets animation math and causes jumps/glitches. */
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-nav-shell::before {
+    animation: none;
+    opacity: 0.5;
+  }
+
+  .dp-marquee-scroller--left,
+  .dp-marquee-scroller--right {
+    animation: none !important;
+  }
+}
