@@ -35,7 +35,7 @@ const captionClass =
   "mb-3 text-[11px] font-medium uppercase leading-snug tracking-[0.1em] text-[var(--dp-muted-soft)] md:mb-4 md:text-xs";
 
 const viewMonthlyResultsButtonClass =
-  "rounded-full border border-white/[0.14] bg-white/[0.1] px-8 py-2.5 text-sm font-medium text-white/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl transition hover:border-white/[0.18] hover:bg-white/[0.14] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--dp-bg)] motion-reduce:transition-none";
+  "rounded-full border border-white/[0.08] bg-black/40 px-8 py-2.5 text-sm font-medium text-white/88 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl transition hover:border-white/[0.11] hover:bg-black/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--dp-bg)] motion-reduce:transition-none";
 
 let fxBlueBodyScrollLocks = 0;
 function lockFxBlueBodyScroll() {
@@ -239,7 +239,7 @@ function MonthReturnCell({
   scaleMax: number;
 }) {
   const cellFrame =
-    "relative flex min-h-[3rem] w-full min-w-0 items-center justify-center overflow-hidden rounded-lg border px-1 py-2 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md sm:min-h-[3.35rem] sm:px-1.5 sm:py-2.5";
+    "relative flex min-h-[3rem] w-full min-w-0 items-center justify-center overflow-hidden rounded-lg border border-white/[0.06] px-1 py-2 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] backdrop-blur-md sm:min-h-[3.35rem] sm:px-1.5 sm:py-2.5";
   const pctClass =
     "relative z-[1] block w-full max-w-full whitespace-normal text-center text-[0.62rem] font-semibold tabular-nums leading-tight tracking-[-0.02em] sm:text-[0.68rem] md:text-[0.72rem]";
   const labelClass =
@@ -250,7 +250,7 @@ function MonthReturnCell({
       <div className="flex min-w-0 flex-col">
         <div className={labelClass}>{label}</div>
         <div
-          className={`${cellFrame} border-white/[0.09] bg-white/[0.04] text-white/30`}
+          className={`${cellFrame} border-white/[0.07] bg-black/25 text-white/28`}
         >
           <span className="text-[0.65rem] font-medium tabular-nums">—</span>
         </div>
@@ -264,9 +264,9 @@ function MonthReturnCell({
       <div className="flex min-w-0 flex-col">
         <div className={labelClass}>{label}</div>
         <div
-          className={`${cellFrame} border-teal-200/18`}
+          className={`${cellFrame} border-teal-400/12`}
           style={{
-            backgroundImage: `linear-gradient(165deg, rgba(45, 212, 191, ${tint}) 0%, rgba(255, 255, 255, 0.07) 42%, rgba(255, 255, 255, 0.03) 100%)`,
+            backgroundImage: `linear-gradient(165deg, rgba(45, 212, 191, ${tint * 0.92}) 0%, rgba(12, 18, 24, 0.88) 55%, rgba(4, 6, 10, 0.92) 100%)`,
           }}
         >
           <span className={`${pctClass} text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]`}>
@@ -280,9 +280,9 @@ function MonthReturnCell({
     <div className="flex min-w-0 flex-col">
       <div className={labelClass}>{label}</div>
       <div
-        className={`${cellFrame} border-rose-300/18`}
+        className={`${cellFrame} border-rose-400/12`}
         style={{
-          backgroundImage: `linear-gradient(165deg, rgba(251, 113, 133, ${tint}) 0%, rgba(255, 255, 255, 0.06) 42%, rgba(255, 255, 255, 0.025) 100%)`,
+          backgroundImage: `linear-gradient(165deg, rgba(251, 113, 133, ${tint * 0.9}) 0%, rgba(18, 12, 16, 0.88) 55%, rgba(8, 4, 6, 0.92) 100%)`,
         }}
       >
         <span className={`${pctClass} text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]`}>
@@ -302,7 +302,7 @@ function MonthlyYearBlocks({ matrix }: { matrix: YearMatrixRow[] }) {
           key={year}
           className="dp-fx-glass-year rounded-xl p-3.5 sm:p-4"
         >
-          <h4 className="mb-3.5 border-b border-white/[0.1] pb-2.5 text-left font-[family-name:var(--font-syne)] text-xs font-bold uppercase tracking-[0.14em] text-white/80 sm:text-sm sm:tracking-[0.12em]">
+          <h4 className="mb-3.5 border-b border-white/[0.08] pb-2.5 text-left font-[family-name:var(--font-syne)] text-xs font-bold uppercase tracking-[0.14em] text-white/70 sm:text-sm sm:tracking-[0.12em]">
             {year}
           </h4>
           <div className="grid grid-cols-6 gap-2 sm:gap-2.5">
@@ -331,10 +331,10 @@ function FxBlueVerifyRow({
   verifyMonthly: string;
 }) {
   const a =
-    "text-[0.72rem] font-semibold text-white/85 underline-offset-2 transition hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-sm";
+    "text-[0.72rem] font-semibold text-white/72 underline-offset-2 transition hover:text-white/95 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-sm";
   return (
-    <div className="flex flex-col items-center gap-2.5 border-t border-white/[0.1] bg-white/[0.06] px-4 py-3.5 backdrop-blur-xl sm:px-5">
-      <p className="text-center text-[0.62rem] font-medium uppercase tracking-[0.12em] text-white/50">
+    <div className="flex flex-col items-center gap-2.5 border-t border-white/[0.06] bg-black/55 px-4 py-3.5 backdrop-blur-xl sm:px-5">
+      <p className="text-center text-[0.62rem] font-medium uppercase tracking-[0.12em] text-white/38">
         Verify on FX Blue
       </p>
       <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5">
@@ -396,9 +396,9 @@ function MonthlyAllYearsModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative z-10 flex max-h-[min(85dvh,540px)] w-full max-w-lg flex-col overflow-hidden rounded-2xl dp-fx-glass-panel"
+        className="relative z-10 flex max-h-[min(85dvh,540px)] w-full max-w-lg flex-col overflow-hidden rounded-2xl dp-fx-glass-modal"
       >
-        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.1] bg-white/[0.04] px-4 py-3.5 backdrop-blur-md sm:px-5">
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.06] bg-black/45 px-4 py-3.5 backdrop-blur-md sm:px-5">
           <h3
             id={titleId}
             className="pr-2 font-[family-name:var(--font-syne)] text-sm font-bold tracking-tight text-white sm:text-base"
@@ -408,13 +408,13 @@ function MonthlyAllYearsModal({
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 rounded-lg border border-white/[0.1] bg-white/[0.08] px-2.5 py-1 text-lg leading-none text-white/75 backdrop-blur-sm transition hover:border-white/[0.14] hover:bg-white/[0.14] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            className="shrink-0 rounded-lg border border-white/[0.07] bg-black/40 px-2.5 py-1 text-lg leading-none text-white/60 backdrop-blur-sm transition hover:border-white/[0.1] hover:bg-black/55 hover:text-white/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             aria-label="Close"
           >
             ×
           </button>
         </div>
-        <div className="max-h-[min(62dvh,400px)] overflow-y-auto overflow-x-hidden overscroll-contain bg-white/[0.02] px-4 py-4 sm:px-5">
+        <div className="max-h-[min(62dvh,400px)] overflow-y-auto overflow-x-hidden overscroll-contain bg-black/30 px-4 py-4 sm:px-5">
           <div className="flex flex-col gap-4">
             <MonthlyYearBlocks matrix={matrix} />
           </div>
@@ -630,7 +630,7 @@ function CumulativeChart({
 
           {hover && tip ? (
             <div
-              className="pointer-events-none absolute z-10 max-w-[min(260px,calc(100%-1rem))] rounded-lg border border-white/[0.14] bg-white/[0.12] px-3 py-2 text-left shadow-lg backdrop-blur-xl"
+              className="pointer-events-none absolute z-10 max-w-[min(260px,calc(100%-1rem))] rounded-lg border border-white/[0.1] bg-black/55 px-3 py-2 text-left shadow-lg backdrop-blur-xl"
               style={{
                 left: `${(hover.cx / w) * 100}%`,
                 top: "8px",
@@ -755,9 +755,9 @@ function MonthlyIframeModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative z-10 flex h-[min(82dvh,640px)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl dp-fx-glass-panel"
+        className="relative z-10 flex h-[min(82dvh,640px)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl dp-fx-glass-modal"
       >
-        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.1] bg-white/[0.04] px-4 py-3.5 backdrop-blur-md sm:px-5">
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.06] bg-black/45 px-4 py-3.5 backdrop-blur-md sm:px-5">
           <h3
             id={titleId}
             className="pr-2 font-[family-name:var(--font-syne)] text-sm font-bold tracking-tight text-white sm:text-base"
@@ -767,13 +767,13 @@ function MonthlyIframeModal({
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 rounded-lg border border-white/[0.1] bg-white/[0.08] px-2.5 py-1 text-lg leading-none text-white/75 backdrop-blur-sm transition hover:border-white/[0.14] hover:bg-white/[0.14] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            className="shrink-0 rounded-lg border border-white/[0.07] bg-black/40 px-2.5 py-1 text-lg leading-none text-white/60 backdrop-blur-sm transition hover:border-white/[0.1] hover:bg-black/55 hover:text-white/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             aria-label="Close"
           >
             ×
           </button>
         </div>
-        <div className="min-h-0 flex-1 bg-white/[0.02] p-2 sm:p-3">
+        <div className="min-h-0 flex-1 bg-black/25 p-2 sm:p-3">
           <iframe
             src={src}
             title={iframeTitle}
@@ -808,11 +808,11 @@ function ProfitCard({
   return (
     <div className={`${cardShell} flex min-h-0 flex-1 flex-col`}>
       <p className={captionClass}>Cumulative profit</p>
-      <div className="dp-fx-glass-inset flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-xl">
+      <div className="dp-fx-glass-chart flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-xl">
         <div className="relative min-h-[240px] w-full min-w-0 flex-1 basis-0 md:min-h-[400px] lg:min-h-[min(480px,58vh)]">
           <CumulativeChart series={series} currency={currency} />
         </div>
-        <p className="shrink-0 border-t border-white/[0.1] bg-white/[0.03] px-3 py-2.5 text-center text-xs leading-snug text-[var(--dp-muted)] backdrop-blur-sm">
+        <p className="shrink-0 border-t border-white/[0.06] bg-black/55 px-3 py-2.5 text-center text-xs leading-snug text-[var(--dp-muted)] backdrop-blur-md">
           <span className="text-white/75">{series[0]?.date}</span>
           <span className="text-white/35"> → </span>
           <span className="text-white/75">{last.date}</span>
