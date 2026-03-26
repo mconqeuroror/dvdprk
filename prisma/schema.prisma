@@ -28,3 +28,31 @@ model SiteSettings {
 
   @@map("site_settings")
 }
+
+/// Marketing short links: /r/{slug} logs a row then redirects to destination + UTM params.
+model UtmTrackedLink {
+  id             String         @id @default(cuid())
+  slug           String         @unique
+  name           String
+  destinationUrl String         @map("destination_url")
+  utmSource      String         @map("utm_source")
+  utmMedium      String         @map("utm_medium")
+  utmCampaign    String         @map("utm_campaign")
+  utmContent     String?        @map("utm_content")
+  utmTerm        String?        @map("utm_term")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  clicks         UtmLinkClick[]
+
+  @@map("utm_tracked_links")
+}
+
+model UtmLinkClick {
+  id        String         @id @default(cuid())
+  linkId    String         @map("link_id")
+  link      UtmTrackedLink @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now()) @map("created_at")
+
+  @@index([linkId, createdAt])
+  @@map("utm_link_clicks")
+}

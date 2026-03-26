@@ -36,6 +36,12 @@ export default async function AdminPanelPage({
             Funnel editor
           </Link>
           <Link
+            href="/admin/utm"
+            className="text-sm text-[var(--dp-accent)] hover:underline"
+          >
+            UTM links
+          </Link>
+          <Link
             href="/"
             className="text-sm text-[var(--dp-muted)] hover:text-white"
           >

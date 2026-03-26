@@ -35,6 +35,12 @@ export default async function AdminFunnelPage({
           >
             Media &amp; copy
           </Link>
+          <Link
+            href="/admin/utm"
+            className="text-sm text-[var(--dp-muted)] hover:text-white"
+          >
+            UTM links
+          </Link>
           <Link href="/" className="text-sm text-[var(--dp-muted)] hover:text-white">
             View site
           </Link>

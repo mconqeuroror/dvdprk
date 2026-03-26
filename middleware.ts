@@ -5,7 +5,8 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   if (
     pathname.startsWith("/admin/panel") ||
-    pathname.startsWith("/admin/funnel")
+    pathname.startsWith("/admin/funnel") ||
+    pathname.startsWith("/admin/utm")
   ) {
     const ok = request.cookies.get("dp_admin")?.value === "1";
     if (!ok) {
@@ -21,5 +22,7 @@ export const config = {
     "/admin/panel/:path*",
     "/admin/funnel",
     "/admin/funnel/:path*",
+    "/admin/utm",
+    "/admin/utm/:path*",
   ],
 };
