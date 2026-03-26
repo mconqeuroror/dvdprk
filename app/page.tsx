@@ -28,9 +28,9 @@ export default async function HomePage() {
     <div className="relative min-h-screen overflow-hidden pt-[max(1.25rem,env(safe-area-inset-top))] sm:pt-10 md:pt-12">
       <PageBackgroundGlow variant="home" />
       {process.env.NODE_ENV === "development" ? <DevScrollGrid /> : null}
-      {/* Subtle accent radial — mirrors the marquee-center treatment; anchors bottom-right vs top-left orb */}
+      {/* Accent radial — strength tuned to read closer to top-left PageBackgroundGlow accent (orb × ~0.4 opacity) */}
       <div
-        className="pointer-events-none absolute bottom-0 right-0 z-0 h-[min(78vh,640px)] w-[min(96vw,820px)] bg-[radial-gradient(ellipse_68%_52%_at_76%_74%,rgba(98,67,255,0.13)_0%,rgba(98,67,255,0.04)_38%,transparent_72%)] sm:h-[min(70vh,680px)] sm:w-[min(88vw,900px)]"
+        className="pointer-events-none absolute bottom-0 right-0 z-0 h-[min(88vh,760px)] w-[min(100vw,960px)] bg-[radial-gradient(ellipse_58%_46%_at_78%_78%,rgba(98,67,255,0.38)_0%,rgba(98,67,255,0.18)_26%,rgba(98,67,255,0.08)_46%,rgba(98,67,255,0.03)_62%,transparent_78%)] sm:h-[min(82vh,840px)] sm:w-[min(96vw,1080px)] sm:bg-[radial-gradient(ellipse_56%_44%_at_80%_80%,rgba(98,67,255,0.42)_0%,rgba(98,67,255,0.2)_24%,rgba(98,67,255,0.09)_44%,rgba(98,67,255,0.035)_58%,transparent_76%)]"
         aria-hidden
       />
 
