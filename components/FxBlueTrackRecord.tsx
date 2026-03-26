@@ -1,18 +1,23 @@
+/**
+ * FX Blue charts render inside third-party iframes. Card shell, padding, borders,
+ * and captions are ours; gridlines, table colors, row hovers, and in-widget typography
+ * are controlled by FX Blue unless they expose theme URL parameters.
+ */
 const FX_CHARTS = [
   {
-    key: "profit",
+    widgetKey: "profit",
     label: "Cumulative profit",
     title: "Cumulative profit — FX Blue",
     src: "https://www.fxblue.com/fxbluechart.aspx?c=ch_cumulativeprofit&id=david_perk",
   },
   {
-    key: "account",
+    widgetKey: "account",
     label: "Live account & equity",
     title: "Live account overview — FX Blue",
     src: "https://www.fxblue.com/fxbluechart.aspx?c=ch_accountinfo&id=david_perk",
   },
   {
-    key: "monthly",
+    widgetKey: "monthly",
     label: "Monthly returns",
     title: "Monthly return table — FX Blue",
     src: "https://www.fxblue.com/fxbluechart.aspx?c=ch_monthlyreturntable&id=david_perk",
@@ -22,33 +27,36 @@ const FX_CHARTS = [
 const sectionHeadingClass =
   "text-center font-[family-name:var(--font-syne)] text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl";
 
+/** Shared shell: deep charcoal, 10px radius, 1px hairline, 20–24px padding, DM Sans. */
 function ChartFrame({
   src,
   title,
   label,
-}: {
-  src: string;
-  title: string;
-  label: string;
-}) {
+  widgetKey,
+}: (typeof FX_CHARTS)[number]) {
+  const captionId = `fx-widget-caption-${widgetKey}`;
+
   return (
-    <figure className="w-full">
-      <div
-        className="overflow-hidden rounded-2xl border border-white/[0.14] bg-gradient-to-b from-white/[0.07] to-black/35 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.75)] ring-1 ring-inset ring-white/[0.05] transition-[border-color,box-shadow] duration-300 hover:border-white/20 hover:shadow-[0_16px_48px_-10px_rgba(0,0,0,0.65)]"
-      >
-        <div className="bg-black/25">
+    <figure className="w-full font-[family-name:var(--font-dm-sans)]">
+      <div className="rounded-[10px] border border-solid border-[rgba(255,255,255,0.08)] bg-[#0f1117] p-5 md:p-6">
+        <p
+          id={captionId}
+          className="mb-3 text-[11px] font-medium uppercase leading-snug tracking-[0.1em] text-[rgba(243,240,254,0.5)] md:mb-4 md:text-xs"
+        >
+          {label}
+        </p>
+        <div className="overflow-hidden rounded-[10px] bg-[#0f1117] ring-1 ring-inset ring-[rgba(255,255,255,0.06)]">
           <iframe
             src={src}
             title={title}
-            className="block aspect-[2/1] min-h-[192px] w-full sm:min-h-[210px] md:min-h-[228px] lg:min-h-[248px]"
+            aria-labelledby={captionId}
+            className="block aspect-[2/1] min-h-[200px] w-full sm:min-h-[218px] md:min-h-[236px] lg:min-h-[256px]"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
+            style={{ colorScheme: "dark" }}
           />
         </div>
       </div>
-      <figcaption className="mt-3 text-center text-[0.7rem] font-medium uppercase tracking-[0.12em] text-[var(--dp-muted)] sm:text-xs">
-        {label}
-      </figcaption>
     </figure>
   );
 }
@@ -73,14 +81,14 @@ export function FxBlueTrackRecord() {
         Inspect track record of my forex live account.
       </p>
 
-      <div className="mx-auto mt-9 grid max-w-6xl grid-cols-1 gap-7 sm:mt-11 sm:gap-8 md:grid-cols-2 md:gap-x-10 md:gap-y-8">
-        <div className="mx-auto w-full max-w-[480px] md:mx-0 md:max-w-none md:justify-self-end md:pr-2 lg:max-w-[500px]">
+      <div className="mx-auto mt-9 grid max-w-6xl grid-cols-1 gap-6 sm:mt-11 sm:gap-7 md:grid-cols-2 md:gap-x-8 md:gap-y-7">
+        <div className="mx-auto w-full max-w-[520px] md:mx-0 md:max-w-none md:justify-self-end md:pr-2 lg:max-w-[540px]">
           <ChartFrame {...FX_CHARTS[0]} />
         </div>
-        <div className="mx-auto w-full max-w-[480px] md:mx-0 md:max-w-none md:justify-self-start md:pl-2 lg:max-w-[500px]">
+        <div className="mx-auto w-full max-w-[520px] md:mx-0 md:max-w-none md:justify-self-start md:pl-2 lg:max-w-[540px]">
           <ChartFrame {...FX_CHARTS[1]} />
         </div>
-        <div className="mx-auto w-full max-w-[480px] md:mx-0 md:max-w-none md:justify-self-end md:pr-2 lg:max-w-[500px]">
+        <div className="mx-auto w-full max-w-[520px] md:mx-0 md:max-w-none md:justify-self-end md:pr-2 lg:max-w-[540px]">
           <ChartFrame {...FX_CHARTS[2]} />
         </div>
         <div
