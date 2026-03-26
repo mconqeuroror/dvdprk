@@ -2,6 +2,7 @@ import Link from "next/link";
 import { HeroVideo } from "@/components/HeroVideo";
 import { ImageMarqueeRows } from "@/components/ImageMarqueeRows";
 import { DevScrollGrid } from "@/components/DevScrollGrid";
+import { FxBlueTrackRecord } from "@/components/FxBlueTrackRecord";
 import { PageBackgroundGlow } from "@/components/PageBackgroundGlow";
 import { SiteFooter } from "@/components/SiteFooter";
 import { WHOP_JOIN_URL } from "@/lib/join-url";
@@ -84,6 +85,8 @@ export default async function HomePage() {
             className="relative z-[1] mt-0"
           />
         </div>
+
+        <FxBlueTrackRecord />
 
         <div className="mx-auto mt-8 flex justify-center px-3 sm:mt-10 sm:px-4">
           <Link
