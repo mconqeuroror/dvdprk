@@ -36,6 +36,9 @@ const cardShell =
 const captionClass =
   "mb-3 text-[11px] font-medium uppercase leading-snug tracking-[0.1em] text-[rgba(243,240,254,0.5)] md:mb-4 md:text-xs";
 
+const viewMonthlyResultsButtonClass =
+  "rounded-full border border-white/[0.14] bg-white/[0.06] px-8 py-2.5 text-sm font-medium text-white/95 shadow-sm transition hover:bg-white/[0.1] focus-visible:outline focus-visible:ring-2 focus-visible:ring-[var(--dp-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0c]";
+
 function VerifyOnFxBlue({ href }: { href: string }) {
   return (
     <a
@@ -654,39 +657,75 @@ function AccountCard({
   );
 }
 
-/** Full monthly grid only in a modal — no month matrix on the main layout */
-function MonthlyReturnsModalButton({
-  months,
-  verifyUrl,
+/** Embed fallback: monthly FX Blue widget inside a dialog */
+function MonthlyIframeModal({
+  src,
+  iframeTitle,
+  onClose,
+  titleId,
 }: {
-  months: FxBlueMonthPoint[];
-  verifyUrl: string;
+  src: string;
+  iframeTitle: string;
+  onClose: () => void;
+  titleId: string;
 }) {
-  const fullMatrix = buildMonthMatrix(months);
-  const [modalOpen, setModalOpen] = useState(false);
-  const modalTitleId = useId().replace(/:/g, "");
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [onClose]);
 
   return (
-    <div className="mt-3 border-t border-white/[0.06] pt-3">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6">
       <button
         type="button"
-        onClick={() => setModalOpen(true)}
-        className="w-full rounded-lg border border-white/[0.12] bg-white/[0.04] py-2.5 text-center text-xs font-medium text-white/90 transition hover:bg-white/[0.08]"
+        className="absolute inset-0 bg-black/80 backdrop-blur-[2px]"
+        aria-label="Close"
+        onClick={onClose}
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="relative z-10 flex h-[min(82dvh,640px)] w-full max-w-2xl flex-col overflow-hidden rounded-[12px] border border-white/[0.1] bg-[#0f1117] shadow-2xl"
       >
-        View monthly returns by year
-      </button>
-      <VerifyOnFxBlue href={verifyUrl} />
-      {modalOpen
-        ? createPortal(
-            <MonthlyAllYearsModal
-              matrix={fullMatrix}
-              verifyUrl={verifyUrl}
-              onClose={() => setModalOpen(false)}
-              titleId={modalTitleId}
-            />,
-            document.body,
-          )
-        : null}
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.08] px-4 py-3 sm:px-5">
+          <h3
+            id={titleId}
+            className="pr-2 font-[family-name:var(--font-dm-sans)] text-sm font-semibold text-white sm:text-base"
+          >
+            Monthly returns
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="shrink-0 rounded-md px-2 py-1 text-lg leading-none text-white/60 transition hover:bg-white/10 hover:text-white"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <div className="min-h-0 flex-1 p-2 sm:p-3">
+          <iframe
+            src={src}
+            title={iframeTitle}
+            className="h-full min-h-[280px] w-full rounded-lg bg-black/40"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            style={{ colorScheme: "dark" }}
+          />
+        </div>
+        <div className="shrink-0 border-t border-white/[0.08] px-4 py-3 sm:px-5">
+          <VerifyOnFxBlue href={src} />
+        </div>
+      </div>
     </div>
   );
 }
@@ -695,14 +734,10 @@ function ProfitCard({
   series,
   verifyUrl,
   currency,
-  months,
-  monthlyVerifyUrl,
 }: {
   series: FxBlueCumulativePoint[];
   verifyUrl: string;
   currency: string;
-  months: FxBlueMonthPoint[] | null;
-  monthlyVerifyUrl: string;
 }) {
   const last = series[series.length - 1]!;
   return (
@@ -724,12 +759,6 @@ function ProfitCard({
         </p>
       </div>
       <VerifyOnFxBlue href={verifyUrl} />
-      {months?.length ? (
-        <MonthlyReturnsModalButton
-          months={months}
-          verifyUrl={monthlyVerifyUrl}
-        />
-      ) : null}
     </div>
   );
 }
@@ -777,6 +806,8 @@ function IframeFallback({ verify }: { verify: ApiPayload["verify"] | null }) {
   const id = fxBluePublisherId();
   const monthlySrc =
     verify?.monthly || fxBlueWidgetUrl(FX_WIDGET.monthly, id);
+  const [monthlyModalOpen, setMonthlyModalOpen] = useState(false);
+  const monthlyModalTitleId = useId().replace(/:/g, "");
 
   const makeIframe = (
     f: (typeof IFRAMES)[number],
@@ -824,16 +855,26 @@ function IframeFallback({ verify }: { verify: ApiPayload["verify"] | null }) {
         account={makeIframe(IFRAMES[1])}
         profit={makeIframe(IFRAMES[0], { tall: true })}
       />
-      <p className="mx-auto mt-5 max-w-2xl text-center text-xs text-[var(--dp-muted)]">
-        <a
-          href={monthlySrc}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[var(--dp-accent)] underline-offset-2 hover:underline"
+      <div className="mx-auto mt-6 flex w-full max-w-6xl justify-center px-3 sm:mt-8 sm:px-4 md:px-6">
+        <button
+          type="button"
+          onClick={() => setMonthlyModalOpen(true)}
+          className={viewMonthlyResultsButtonClass}
         >
-          Open monthly returns (FX Blue widget)
-        </a>
-      </p>
+          View monthly results
+        </button>
+      </div>
+      {monthlyModalOpen
+        ? createPortal(
+            <MonthlyIframeModal
+              src={monthlySrc}
+              iframeTitle="Monthly returns — FX Blue"
+              onClose={() => setMonthlyModalOpen(false)}
+              titleId={monthlyModalTitleId}
+            />,
+            document.body,
+          )
+        : null}
     </>
   );
 }
@@ -841,6 +882,8 @@ function IframeFallback({ verify }: { verify: ApiPayload["verify"] | null }) {
 export function FxBlueTrackRecord() {
   const [payload, setPayload] = useState<ApiPayload | null>(null);
   const [loadError, setLoadError] = useState(false);
+  const [monthlyModalOpen, setMonthlyModalOpen] = useState(false);
+  const monthlyModalTitleId = useId().replace(/:/g, "");
 
   useEffect(() => {
     let cancel = false;
@@ -905,23 +948,47 @@ export function FxBlueTrackRecord() {
           </div>
         </div>
       ) : showCustom && payload ? (
-        <TwoColTrackGrid
-          account={
-            <AccountCard
-              data={payload.account!}
-              verifyUrl={payload.verify.account}
-            />
-          }
-          profit={
-            <ProfitCard
-              series={payload.cumulative!}
-              verifyUrl={payload.verify.cumulative}
-              currency={payload.account!.currency}
-              months={payload.monthly!}
-              monthlyVerifyUrl={payload.verify.monthly}
-            />
-          }
-        />
+        <>
+          <TwoColTrackGrid
+            account={
+              <AccountCard
+                data={payload.account!}
+                verifyUrl={payload.verify.account}
+              />
+            }
+            profit={
+              <ProfitCard
+                series={payload.cumulative!}
+                verifyUrl={payload.verify.cumulative}
+                currency={payload.account!.currency}
+              />
+            }
+          />
+          {payload.monthly?.length ? (
+            <>
+              <div className="mx-auto mt-6 flex w-full max-w-6xl justify-center px-3 sm:mt-8 sm:px-4 md:px-6">
+                <button
+                  type="button"
+                  onClick={() => setMonthlyModalOpen(true)}
+                  className={viewMonthlyResultsButtonClass}
+                >
+                  View monthly results
+                </button>
+              </div>
+              {monthlyModalOpen
+                ? createPortal(
+                    <MonthlyAllYearsModal
+                      matrix={buildMonthMatrix(payload.monthly!)}
+                      verifyUrl={payload.verify.monthly}
+                      onClose={() => setMonthlyModalOpen(false)}
+                      titleId={monthlyModalTitleId}
+                    />,
+                    document.body,
+                  )
+                : null}
+            </>
+          ) : null}
+        </>
       ) : (
         <IframeFallback verify={payload?.verify ?? null} />
       )}
@@ -943,8 +1010,8 @@ export function FxBlueTrackRecord() {
           <strong className="text-white/75">closed profit</strong>, the{" "}
           <strong className="text-white/75">cumulative profit</strong> curve;{" "}
           <strong className="text-white/75">monthly return %</strong> is available
-          via <strong className="text-white/75">View monthly returns by year</strong>{" "}
-          under the chart.
+          via <strong className="text-white/75">View monthly results</strong> below
+          the track record.
         </p>
         <p className="mt-1.5 sm:mt-2">
           <strong className="text-white/80">Trust and verification:</strong> Data
