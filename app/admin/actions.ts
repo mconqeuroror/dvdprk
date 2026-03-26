@@ -156,6 +156,9 @@ export async function saveSiteConfigAction(formData: FormData) {
     homeStudentResultsHeading: String(
       formData.get("homeStudentResultsHeading") ?? "",
     ).trim(),
+    homeStudentResultsSubtext: String(
+      formData.get("homeStudentResultsSubtext") ?? "",
+    ).trim(),
     freeCourseModules: normalizeFreeCourseModules(freeCourseModules),
   };
   await writeSiteConfig(config);

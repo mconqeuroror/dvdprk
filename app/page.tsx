@@ -66,6 +66,11 @@ export default async function HomePage() {
           <h2 className={sectionHeadingClass}>
             {config.homeStudentResultsHeading}
           </h2>
+          {config.homeStudentResultsSubtext ? (
+            <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-4 sm:text-lg">
+              {config.homeStudentResultsSubtext}
+            </p>
+          ) : null}
         </div>
 
         <div className="relative z-0 mt-6 w-full">

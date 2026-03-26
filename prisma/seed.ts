@@ -10,6 +10,7 @@ const defaultSitePayload = {
   homeHeroDescription:
     "Clear frameworks, accountability, and a process you can repeat. Start with the basic course, then book a call when you're ready to go deeper.",
   homeStudentResultsHeading: "Student results",
+  homeStudentResultsSubtext: "Learn alongside profitable traders",
   sliderRow1: Array(10).fill(""),
   sliderRow2: Array(10).fill(""),
   successVideos: ["", "", ""],

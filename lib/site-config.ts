@@ -25,6 +25,8 @@ export type SiteConfig = {
   homeHeroDescription: string;
   /** Home “Student results” section heading */
   homeStudentResultsHeading: string;
+  /** Line below “Student results” (optional; empty hides it) */
+  homeStudentResultsSubtext: string;
   sliderRow1: string[];
   sliderRow2: string[];
   successVideos: string[];
@@ -42,12 +44,16 @@ const DEFAULT_FREE_MODULES: FreeCourseModule[] = [
 const DEFAULT_HOME_DESC =
   "Clear frameworks, accountability, and a process you can repeat. Start with the basic course, then book a call when you're ready to go deeper.";
 
+const DEFAULT_STUDENT_RESULTS_SUBTEXT =
+  "Learn alongside profitable traders";
+
 const DEFAULTS: SiteConfig = {
   heroVideoUrl: "",
   homeHeroTitlePrimary: "Build a funded path",
   homeHeroTitleMuted: " without the noise.",
   homeHeroDescription: DEFAULT_HOME_DESC,
   homeStudentResultsHeading: "Student results",
+  homeStudentResultsSubtext: DEFAULT_STUDENT_RESULTS_SUBTEXT,
   sliderRow1: Array(10).fill(""),
   sliderRow2: Array(10).fill(""),
   successVideos: ["", "", ""],
@@ -108,6 +114,11 @@ function normalizeFromUnknown(parsed: unknown): SiteConfig {
   const muted = String(p.homeHeroTitleMuted ?? "");
   const desc = String(p.homeHeroDescription ?? "").trim();
   const resultsH = String(p.homeStudentResultsHeading ?? "").trim();
+  const resultsSub =
+    p.homeStudentResultsSubtext === undefined ||
+    p.homeStudentResultsSubtext === null
+      ? DEFAULT_STUDENT_RESULTS_SUBTEXT
+      : String(p.homeStudentResultsSubtext).trim();
   return {
     heroVideoUrl: String(p.heroVideoUrl ?? ""),
     homeHeroTitlePrimary: primary || DEFAULTS.homeHeroTitlePrimary,
@@ -115,6 +126,7 @@ function normalizeFromUnknown(parsed: unknown): SiteConfig {
     homeHeroDescription: desc || DEFAULT_HOME_DESC,
     homeStudentResultsHeading:
       resultsH || DEFAULTS.homeStudentResultsHeading,
+    homeStudentResultsSubtext: resultsSub,
     sliderRow1: pad10(p.sliderRow1),
     sliderRow2: pad10(p.sliderRow2),
     successVideos: pad3(p.successVideos),
@@ -163,6 +175,7 @@ export async function writeSiteConfig(config: SiteConfig): Promise<void> {
     homeStudentResultsHeading:
       config.homeStudentResultsHeading.trim() ||
       DEFAULTS.homeStudentResultsHeading,
+    homeStudentResultsSubtext: config.homeStudentResultsSubtext.trim(),
     sliderRow1: pad10(config.sliderRow1),
     sliderRow2: pad10(config.sliderRow2),
     successVideos: pad3(config.successVideos),

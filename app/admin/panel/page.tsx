@@ -48,8 +48,8 @@ export default async function AdminPanelPage({
 
       {sp.saved ? (
         <p className="mt-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-200">
-          Basic course module text and order saved to {storageHint}. Media above
-          is saved as you upload or click Save link / Remove.
+          Home copy, basic course module text and order saved to {storageHint}.
+          Media above is saved as you upload or click Save link / Remove.
         </p>
       ) : null}
 
@@ -141,8 +141,9 @@ export default async function AdminPanelPage({
             Home page copy
           </h2>
           <p className="text-xs text-[var(--dp-muted)]">
-            Shown on <code className="text-white/70">/</code>. Muted line is the
-            gray part after the main headline (leave empty to hide it).
+            Shown on the home page (<code className="text-white/70">/</code>).
+            The muted line is the gray part after the main headline (leave empty
+            to hide it).
           </p>
           <div className="space-y-2">
             <label className="block text-xs text-[var(--dp-muted)]" htmlFor="homeHeroTitlePrimary">
@@ -191,6 +192,25 @@ export default async function AdminPanelPage({
               defaultValue={config.homeStudentResultsHeading}
               className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white"
             />
+          </div>
+          <div className="space-y-2">
+            <label
+              className="block text-xs text-[var(--dp-muted)]"
+              htmlFor="homeStudentResultsSubtext"
+            >
+              “Student results” line below title
+            </label>
+            <input
+              id="homeStudentResultsSubtext"
+              name="homeStudentResultsSubtext"
+              defaultValue={config.homeStudentResultsSubtext}
+              placeholder="Learn alongside profitable traders"
+              className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/35"
+            />
+            <p className="text-[0.65rem] text-[var(--dp-muted)]">
+              Shown under the section heading, above the sliders. Clear the field
+              to hide.
+            </p>
           </div>
         </section>
 
