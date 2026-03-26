@@ -1,7 +1,14 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useId, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { createPortal } from "react-dom";
 import {
   FX_WIDGET,
@@ -65,6 +72,20 @@ function formatMoney(n: number, currency: string) {
   }
 }
 
+/** Tooltip / headline style: $1,168,765 */
+function formatTooltipProfit(n: number, currency: string) {
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency || "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(n);
+  } catch {
+    return formatMoney(n, currency);
+  }
+}
+
 function formatPct(x: number) {
   const s = x >= 0 ? "+" : "";
   return `${s}${x.toFixed(2)}%`;
@@ -114,22 +135,88 @@ function niceProfitTicks(minP: number, maxP: number, maxTicks: number): number[]
   return ticks;
 }
 
-function smoothPathThrough(pts: { x: number; y: number }[]): string {
-  if (pts.length === 0) return "";
-  if (pts.length === 1) return `M ${pts[0].x} ${pts[0].y}`;
-  let d = `M ${pts[0].x} ${pts[0].y}`;
-  for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[Math.max(0, i - 1)];
-    const p1 = pts[i];
-    const p2 = pts[i + 1];
-    const p3 = pts[Math.min(pts.length - 1, i + 2)];
-    const cp1x = p1.x + (p2.x - p0.x) / 6;
-    const cp1y = p1.y + (p2.y - p0.y) / 6;
-    const cp2x = p2.x - (p3.x - p1.x) / 6;
-    const cp2y = p2.y - (p3.y - p1.y) / 6;
-    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+/** Monotone cubic Hermite (Fritsch–Carlson style), x strictly non-decreasing */
+function monotoneCurvePath(pts: { x: number; y: number }[]): string {
+  const n = pts.length;
+  if (n === 0) return "";
+  if (n === 1) return `M ${pts[0].x} ${pts[0].y}`;
+  const x = pts.map((p) => p.x);
+  const y = pts.map((p) => p.y);
+  const m = new Array(n - 1);
+  for (let i = 0; i < n - 1; i++) {
+    const h = x[i + 1]! - x[i]!;
+    m[i] = h > 0 ? (y[i + 1]! - y[i]!) / h : 0;
   }
-  return d;
+  const d = new Array(n).fill(0);
+  d[0] = m[0] ?? 0;
+  d[n - 1] = m[n - 2] ?? 0;
+  for (let i = 1; i < n - 1; i++) {
+    if ((m[i - 1] ?? 0) * (m[i] ?? 0) <= 0) d[i] = 0;
+    else {
+      const h0 = x[i]! - x[i - 1]!;
+      const h1 = x[i + 1]! - x[i]!;
+      const w0 = 2 * h1 + h0;
+      const w1 = h1 + 2 * h0;
+      d[i] = (w0 + w1) / (w0 / (m[i - 1] ?? 0) + w1 / (m[i] ?? 0));
+    }
+  }
+  let path = `M ${x[0]} ${y[0]}`;
+  for (let i = 0; i < n - 1; i++) {
+    const h = x[i + 1]! - x[i]!;
+    path += ` C ${x[i]! + h / 3} ${y[i]! + ((d[i] ?? 0) * h) / 3} ${x[i + 1]! - h / 3} ${y[i + 1]! - ((d[i + 1] ?? 0) * h) / 3} ${x[i + 1]!} ${y[i + 1]!}`;
+  }
+  return path;
+}
+
+function capTickCount(ticks: number[], max: number): number[] {
+  if (ticks.length <= max) return ticks;
+  const step = Math.ceil(ticks.length / max);
+  const out: number[] = [];
+  for (let i = 0; i < ticks.length; i += step) out.push(ticks[i]!);
+  if (out[out.length - 1] !== ticks[ticks.length - 1])
+    out.push(ticks[ticks.length - 1]!);
+  return out;
+}
+
+function pickXYearIndices(
+  series: FxBlueCumulativePoint[],
+  n: number,
+  plotWidth: number,
+): number[] {
+  if (n <= 1) return [0];
+  const minGapPx = 40;
+  const maxByWidth = Math.max(2, Math.floor(plotWidth / minGapPx));
+  const want = Math.min(8, maxByWidth);
+  const raw: number[] = [];
+  for (let k = 0; k < want; k++) {
+    raw.push(Math.round((k / Math.max(want - 1, 1)) * (n - 1)));
+  }
+  const sorted = [...new Set(raw)].sort((a, b) => a - b);
+  const withYears: number[] = [];
+  let prevYear = "";
+  for (const idx of sorted) {
+    const yr = yearFromPoint(series[idx]!.date);
+    if (yr !== prevYear) {
+      withYears.push(idx);
+      prevYear = yr;
+    }
+  }
+  if (withYears.length >= 2) return withYears;
+  return sorted;
+}
+
+function subscribeMaxWidth767(cb: () => void) {
+  const mq = window.matchMedia("(max-width: 767px)");
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+}
+
+function getMaxWidth767Matches() {
+  return window.matchMedia("(max-width: 767px)").matches;
+}
+
+function useIsNarrowMonthly() {
+  return useSyncExternalStore(subscribeMaxWidth767, getMaxWidth767Matches, () => false);
 }
 
 function buildMonthMatrix(months: FxBlueMonthPoint[]) {
@@ -320,23 +407,43 @@ function CumulativeChart({
   currency: string;
 }) {
   const areaGradId = `${useId().replace(/:/g, "")}-area`;
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [dims, setDims] = useState({ w: 0, h: 0 });
   const [hover, setHover] = useState<{
     idx: number;
     cx: number;
     cy: number;
   } | null>(null);
 
-  const w = 640;
-  const h = 288;
-  const padL = 62;
-  const padR = 16;
-  const padT = 16;
-  const padB = 44;
-  const inset = 4;
-  const cw = w - padL - padR;
-  const ch = h - padT - padB - inset * 2;
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      setDims({
+        w: Math.max(0, Math.floor(r.width)),
+        h: Math.max(0, Math.floor(r.height)),
+      });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const ready = dims.w >= 32 && dims.h >= 32;
+  const w = ready ? dims.w : 400;
+  const h = ready ? dims.h : 280;
+  const axisFont = h > 300 ? 12 : 11;
+
+  const padL = 52;
+  const padR = 12;
+  const padT = 12;
+  const padB = 28;
+  const inset = 3;
+  const cw = Math.max(8, w - padL - padR);
   const plotTop = padT + inset;
-  const plotBottom = padT + inset + ch;
+  const plotBottom = h - padB - inset;
   const baseY = plotBottom;
 
   const profits = series.map((s) => s.profit);
@@ -347,19 +454,12 @@ function CumulativeChart({
   const maxP = rawMax + span * 0.04;
   const n = series.length;
 
-  const yVals = niceProfitTicks(minP, maxP, 7);
+  const yVals = capTickCount(niceProfitTicks(minP, maxP, 6), 6);
   const scaleMin = Math.min(minP, ...yVals);
   const scaleMax = Math.max(maxP, ...yVals);
   const yDomain = scaleMax - scaleMin || 1;
 
-  const xTickWant = 6;
-  const xTickIdx: number[] = [];
-  for (let i = 0; i < xTickWant; i++) {
-    xTickIdx.push(
-      Math.round((i / Math.max(xTickWant - 1, 1)) * Math.max(n - 1, 0)),
-    );
-  }
-  const xUnique = [...new Set(xTickIdx)].sort((a, b) => a - b);
+  const xIndices = pickXYearIndices(series, n, cw);
 
   const pts = series.map((s, i) => {
     const x = padL + (i / Math.max(n - 1, 1)) * cw;
@@ -369,7 +469,7 @@ function CumulativeChart({
     return { x, y, date: s.date, profit: s.profit };
   });
 
-  const smoothLine = smoothPathThrough(pts);
+  const smoothLine = monotoneCurvePath(pts);
   const first = pts[0]!;
   const last = pts[pts.length - 1]!;
   const areaD = `${smoothLine} L ${last.x} ${baseY} L ${first.x} ${baseY} Z`;
@@ -393,131 +493,127 @@ function CumulativeChart({
   const tip = hover ? series[hover.idx] : null;
 
   return (
-    <div className="relative w-full">
-      <svg
-        viewBox={`0 0 ${w} ${h}`}
-        className="h-auto w-full max-w-full text-[var(--dp-muted)]"
-        style={{ aspectRatio: `${w} / ${h}` }}
-        role="img"
-        aria-label="Cumulative profit over time"
-        onMouseMove={onSvgPointer}
-        onMouseLeave={() => setHover(null)}
-      >
-        <defs>
-          <linearGradient id={areaGradId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={CHART_ACCENT} stopOpacity="0.2" />
-            <stop offset="100%" stopColor={CHART_ACCENT} stopOpacity="0" />
-          </linearGradient>
-        </defs>
+    <div ref={wrapRef} className="relative h-full min-h-0 w-full min-w-0 flex-1">
+      {ready ? (
+        <>
+          <svg
+            width={w}
+            height={h}
+            className="block max-w-full text-[var(--dp-muted)]"
+            role="img"
+            aria-label="Cumulative profit over time"
+            onMouseMove={onSvgPointer}
+            onMouseLeave={() => setHover(null)}
+          >
+            <defs>
+              <linearGradient id={areaGradId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={CHART_ACCENT} stopOpacity="0.25" />
+                <stop offset="100%" stopColor={CHART_ACCENT} stopOpacity="0" />
+              </linearGradient>
+            </defs>
 
-        {yVals.map((yv, i) => {
-          const y =
-            plotTop +
-            (1 - (yv - scaleMin) / yDomain) * (plotBottom - plotTop);
-          return (
-            <g key={`y-${i}-${yv}`}>
-              <line
-                x1={padL}
-                y1={y}
-                x2={w - padR}
-                y2={y}
-                stroke="rgba(255,255,255,0.07)"
-                strokeWidth={1}
-              />
-              <text
-                x={padL - 8}
-                y={y + 3.5}
-                textAnchor="end"
-                className="fill-[var(--dp-muted)]"
-                style={{ fontSize: 10 }}
-              >
-                {formatAxisDollar(yv)}
-              </text>
-            </g>
-          );
-        })}
+            {yVals.map((yv, i) => {
+              const y =
+                plotTop +
+                (1 - (yv - scaleMin) / yDomain) * (plotBottom - plotTop);
+              return (
+                <g key={`y-${i}-${yv}`}>
+                  <line
+                    x1={padL}
+                    y1={y}
+                    x2={w - padR}
+                    y2={y}
+                    stroke="rgba(255,255,255,0.15)"
+                    strokeWidth={1}
+                  />
+                  <text
+                    x={padL - 10}
+                    y={y}
+                    textAnchor="end"
+                    dominantBaseline="middle"
+                    fill="rgba(243,240,254,0.55)"
+                    style={{
+                      fontSize: axisFont,
+                      fontFamily: "system-ui, sans-serif",
+                    }}
+                  >
+                    {formatAxisDollar(yv)}
+                  </text>
+                </g>
+              );
+            })}
 
-        <path d={areaD} fill={`url(#${areaGradId})`} />
-        <path
-          d={smoothLine}
-          fill="none"
-          stroke={CHART_ACCENT}
-          strokeWidth={2.25}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+            <path d={areaD} fill={`url(#${areaGradId})`} />
+            <path
+              d={smoothLine}
+              fill="none"
+              stroke={CHART_ACCENT}
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
 
-        {xUnique.map((idx, i) => {
-          const p = pts[idx];
-          if (!p) return null;
-          const yr = yearFromPoint(p.date);
-          const prevIdx = i > 0 ? xUnique[i - 1] : -1;
-          const prevYr =
-            prevIdx >= 0 && pts[prevIdx]
-              ? yearFromPoint(pts[prevIdx]!.date)
-              : null;
-          const showYearLabel = yr !== prevYr;
-          return (
-            <g key={`x-${idx}`}>
-              <line
-                x1={p.x}
-                y1={plotTop}
-                x2={p.x}
-                y2={plotBottom}
-                stroke="rgba(255,255,255,0.04)"
-                strokeWidth={1}
-              />
-              {showYearLabel ? (
+            {xIndices.map((idx) => {
+              const p = pts[idx];
+              if (!p) return null;
+              const yr = yearFromPoint(p.date);
+              return (
                 <text
+                  key={`x-${idx}`}
                   x={p.x}
-                  y={h - 14}
+                  y={h - 10}
                   textAnchor="middle"
-                  className="fill-[var(--dp-muted)]"
-                  style={{ fontSize: 10 }}
+                  fill="rgba(243,240,254,0.5)"
+                  style={{
+                    fontSize: axisFont,
+                    fontFamily: "system-ui, sans-serif",
+                  }}
                 >
                   {yr}
                 </text>
-              ) : null}
-            </g>
-          );
-        })}
+              );
+            })}
 
-        {hover && tip ? (
-          <g pointerEvents="none">
-            <line
-              x1={hover.cx}
-              y1={plotTop}
-              x2={hover.cx}
-              y2={plotBottom}
-              stroke="rgba(255,255,255,0.12)"
-              strokeWidth={1}
-            />
-            <circle
-              cx={hover.cx}
-              cy={hover.cy}
-              r={5}
-              fill="#0f1117"
-              stroke={CHART_ACCENT}
-              strokeWidth={2}
-            />
-          </g>
-        ) : null}
-      </svg>
+            {hover && tip ? (
+              <g pointerEvents="none">
+                <line
+                  x1={hover.cx}
+                  y1={plotTop}
+                  x2={hover.cx}
+                  y2={plotBottom}
+                  stroke="rgba(255,255,255,0.15)"
+                  strokeWidth={1}
+                />
+                <circle
+                  cx={hover.cx}
+                  cy={hover.cy}
+                  r={5}
+                  fill="#0f1117"
+                  stroke={CHART_ACCENT}
+                  strokeWidth={2}
+                />
+              </g>
+            ) : null}
+          </svg>
 
-      {hover && tip ? (
-        <div
-          className="pointer-events-none absolute z-10 max-w-[min(240px,calc(100%-1rem))] rounded-md border border-white/[0.12] bg-[#1a1d26] px-2.5 py-2 text-left shadow-lg"
-          style={{
-            left: `${(hover.cx / w) * 100}%`,
-            top: "6px",
-            transform: "translateX(-50%)",
-          }}
-        >
-          <p className="text-[0.65rem] font-medium text-white/90">{tip.date}</p>
-          <p className="mt-0.5 text-[0.7rem] tabular-nums text-[var(--dp-accent)]">
-            {formatMoney(tip.profit, currency)}
-          </p>
-        </div>
+          {hover && tip ? (
+            <div
+              className="pointer-events-none absolute z-10 max-w-[min(260px,calc(100%-1rem))] rounded-md border border-white/[0.12] bg-[#1a1d26] px-2.5 py-2 text-left shadow-lg"
+              style={{
+                left: `${(hover.cx / w) * 100}%`,
+                top: "8px",
+                transform: "translateX(-50%)",
+              }}
+            >
+              <p className="text-[0.7rem] font-medium text-white/90">
+                {tip.date}
+              </p>
+              <p className="mt-0.5 text-xs font-semibold tabular-nums text-[var(--dp-accent)]">
+                {formatTooltipProfit(tip.profit, currency)}
+              </p>
+            </div>
+          ) : null}
+        </>
       ) : null}
     </div>
   );
@@ -592,10 +688,17 @@ function MonthlyTable({
   verifyUrl: string;
 }) {
   const fullMatrix = buildMonthMatrix(months);
-  const previewMatrix = fullMatrix.slice(0, PREVIEW_YEAR_COUNT);
+  const narrow = useIsNarrowMonthly();
+  const currentYear = new Date().getFullYear();
+  const previewMatrix = narrow
+    ? (() => {
+        const thisYear = fullMatrix.find(([y]) => y === currentYear);
+        return thisYear ? [thisYear] : fullMatrix.slice(0, 1);
+      })()
+    : fullMatrix.slice(0, PREVIEW_YEAR_COUNT);
   const [modalOpen, setModalOpen] = useState(false);
   const modalTitleId = useId().replace(/:/g, "");
-  const showViewAll = fullMatrix.length > PREVIEW_YEAR_COUNT;
+  const showViewAll = fullMatrix.length > previewMatrix.length;
 
   return (
     <div className={`${cardShell} ${DATA_PANEL_MIN_H} h-full`}>
@@ -642,7 +745,7 @@ function ProfitCard({
     <div className={`${cardShell} ${DATA_PANEL_MIN_H} h-full`}>
       <p className={captionClass}>Cumulative profit</p>
       <div className="flex min-h-0 flex-1 flex-col rounded-[10px] bg-black/40 ring-1 ring-inset ring-white/[0.06]">
-        <div className="w-full shrink-0">
+        <div className="relative flex w-full min-w-0 flex-1 basis-0 flex-col min-h-[220px] md:min-h-[280px]">
           <CumulativeChart series={series} currency={currency} />
         </div>
         <p className="mt-auto border-t border-white/[0.06] px-3 py-2 text-center text-xs leading-snug text-[var(--dp-muted)]">
