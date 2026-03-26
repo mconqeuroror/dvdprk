@@ -29,13 +29,13 @@ type ApiPayload = {
 };
 
 const cardShell =
-  "rounded-[var(--dp-radius-sm)] border border-solid border-[var(--dp-border-subtle)] bg-[var(--dp-card)] p-5 font-[family-name:var(--font-dm-sans)] md:p-6";
+  "dp-fx-glass-panel rounded-xl p-5 font-[family-name:var(--font-dm-sans)] md:p-6";
 
 const captionClass =
   "mb-3 text-[11px] font-medium uppercase leading-snug tracking-[0.1em] text-[var(--dp-muted-soft)] md:mb-4 md:text-xs";
 
 const viewMonthlyResultsButtonClass =
-  "rounded-full border border-dp-strong bg-white/[0.06] px-8 py-2.5 text-sm font-medium text-white/95 shadow-sm transition hover:bg-white/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--dp-bg)] motion-reduce:transition-none";
+  "rounded-full border border-white/[0.14] bg-white/[0.1] px-8 py-2.5 text-sm font-medium text-white/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl transition hover:border-white/[0.18] hover:bg-white/[0.14] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--dp-bg)] motion-reduce:transition-none";
 
 let fxBlueBodyScrollLocks = 0;
 function lockFxBlueBodyScroll() {
@@ -238,51 +238,56 @@ function MonthReturnCell({
   label: string;
   scaleMax: number;
 }) {
-  const cellClass =
-    "flex min-h-[2.75rem] w-full min-w-0 items-center justify-center rounded-md border px-1 py-1.5 text-center text-[0.6rem] font-semibold tabular-nums leading-snug text-white sm:min-h-[3rem] sm:px-1.5 sm:text-[0.68rem] md:text-[0.72rem]";
+  const cellFrame =
+    "relative flex min-h-[3rem] w-full min-w-0 items-center justify-center overflow-hidden rounded-lg border px-1 py-2 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md sm:min-h-[3.35rem] sm:px-1.5 sm:py-2.5";
   const pctClass =
-    "block w-full max-w-full whitespace-normal text-center leading-tight tracking-tight break-words";
+    "relative z-[1] block w-full max-w-full whitespace-normal text-center text-[0.62rem] font-semibold tabular-nums leading-tight tracking-[-0.02em] sm:text-[0.68rem] md:text-[0.72rem]";
+  const labelClass =
+    "mb-1 flex h-3.5 items-center justify-center text-[0.55rem] font-semibold uppercase tracking-[0.16em] text-white/45 sm:h-4 sm:text-[0.58rem]";
+
   if (value === null) {
     return (
-      <div className="flex min-w-0 flex-col gap-1.5">
-        <div className="flex h-3.5 items-center justify-center text-[0.62rem] font-bold uppercase tracking-[0.12em] text-white/65 sm:h-4 sm:text-[0.65rem]">
-          {label}
-        </div>
+      <div className="flex min-w-0 flex-col">
+        <div className={labelClass}>{label}</div>
         <div
-          className={`${cellClass} border-white/[0.1] bg-white/[0.05] text-white/35`}
+          className={`${cellFrame} border-white/[0.09] bg-white/[0.04] text-white/30`}
         >
-          —
+          <span className="text-[0.65rem] font-medium tabular-nums">—</span>
         </div>
       </div>
     );
   }
   const t = Math.min(1, Math.abs(value) / scaleMax);
-  const alpha = 0.28 + t * 0.62;
+  const tint = 0.08 + t * 0.26;
   if (value >= 0) {
     return (
-      <div className="flex min-w-0 flex-col gap-1.5">
-        <div className="flex h-3.5 items-center justify-center text-[0.62rem] font-bold uppercase tracking-[0.12em] text-white/65 sm:h-4 sm:text-[0.65rem]">
-          {label}
-        </div>
+      <div className="flex min-w-0 flex-col">
+        <div className={labelClass}>{label}</div>
         <div
-          className={`${cellClass} border-emerald-400/25`}
-          style={{ backgroundColor: `rgba(5, 150, 105, ${alpha})` }}
+          className={`${cellFrame} border-teal-200/18`}
+          style={{
+            backgroundImage: `linear-gradient(165deg, rgba(45, 212, 191, ${tint}) 0%, rgba(255, 255, 255, 0.07) 42%, rgba(255, 255, 255, 0.03) 100%)`,
+          }}
         >
-          <span className={pctClass}>{formatPct(value)}</span>
+          <span className={`${pctClass} text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]`}>
+            {formatPct(value)}
+          </span>
         </div>
       </div>
     );
   }
   return (
-    <div className="flex min-w-0 flex-col gap-1.5">
-      <div className="flex h-3.5 items-center justify-center text-[0.62rem] font-bold uppercase tracking-[0.12em] text-white/65 sm:h-4 sm:text-[0.65rem]">
-        {label}
-      </div>
+    <div className="flex min-w-0 flex-col">
+      <div className={labelClass}>{label}</div>
       <div
-        className={`${cellClass} border-red-400/25`}
-        style={{ backgroundColor: `rgba(220, 38, 38, ${alpha})` }}
+        className={`${cellFrame} border-rose-300/18`}
+        style={{
+          backgroundImage: `linear-gradient(165deg, rgba(251, 113, 133, ${tint}) 0%, rgba(255, 255, 255, 0.06) 42%, rgba(255, 255, 255, 0.025) 100%)`,
+        }}
       >
-        <span className={pctClass}>{formatPct(value)}</span>
+        <span className={`${pctClass} text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]`}>
+          {formatPct(value)}
+        </span>
       </div>
     </div>
   );
@@ -295,12 +300,12 @@ function MonthlyYearBlocks({ matrix }: { matrix: YearMatrixRow[] }) {
       {matrix.map(([year, cells]) => (
         <section
           key={year}
-          className="rounded-lg border border-white/[0.08] bg-black/25 p-3 sm:p-3.5"
+          className="dp-fx-glass-year rounded-xl p-3.5 sm:p-4"
         >
-          <h4 className="mb-3 border-b border-white/[0.1] pb-2 text-left text-sm font-semibold tracking-tight text-white">
+          <h4 className="mb-3.5 border-b border-white/[0.1] pb-2.5 text-left font-[family-name:var(--font-syne)] text-xs font-bold uppercase tracking-[0.14em] text-white/80 sm:text-sm sm:tracking-[0.12em]">
             {year}
           </h4>
-          <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
+          <div className="grid grid-cols-6 gap-2 sm:gap-2.5">
             {cells.map((v, i) => (
               <MonthReturnCell
                 key={i}
@@ -326,10 +331,10 @@ function FxBlueVerifyRow({
   verifyMonthly: string;
 }) {
   const a =
-    "text-[0.7rem] font-medium text-[var(--dp-accent)] hover:underline focus-visible:outline focus-visible:ring-2 focus-visible:ring-[var(--dp-accent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[#0f1117] rounded-sm";
+    "text-[0.72rem] font-semibold text-white/85 underline-offset-2 transition hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-sm";
   return (
-    <div className="flex flex-col items-center gap-2 border-t border-white/[0.08] px-4 py-3 sm:px-5">
-      <p className="text-center text-[0.65rem] uppercase tracking-[0.08em] text-white/45">
+    <div className="flex flex-col items-center gap-2.5 border-t border-white/[0.1] bg-white/[0.06] px-4 py-3.5 backdrop-blur-xl sm:px-5">
+      <p className="text-center text-[0.62rem] font-medium uppercase tracking-[0.12em] text-white/50">
         Verify on FX Blue
       </p>
       <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5">
@@ -383,7 +388,7 @@ function MonthlyAllYearsModal({
     <div className="fixed inset-0 z-[220] flex items-center justify-center p-4 sm:p-6">
       <button
         type="button"
-        className="absolute inset-0 bg-black/50 backdrop-blur-md"
+        className="dp-fx-modal-backdrop absolute inset-0"
         aria-label="Close"
         onClick={onClose}
       />
@@ -391,25 +396,25 @@ function MonthlyAllYearsModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative z-10 flex w-full max-w-lg flex-col overflow-hidden rounded-[14px] border border-white/[0.12] bg-[#0f1117]/95 shadow-2xl backdrop-blur-xl max-h-[min(85dvh,520px)]"
+        className="relative z-10 flex max-h-[min(85dvh,540px)] w-full max-w-lg flex-col overflow-hidden rounded-2xl dp-fx-glass-panel"
       >
-        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.08] px-4 py-3 sm:px-5">
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.1] bg-white/[0.04] px-4 py-3.5 backdrop-blur-md sm:px-5">
           <h3
             id={titleId}
-            className="pr-2 font-[family-name:var(--font-dm-sans)] text-sm font-semibold text-white sm:text-base"
+            className="pr-2 font-[family-name:var(--font-syne)] text-sm font-bold tracking-tight text-white sm:text-base"
           >
             Monthly returns
           </h3>
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 rounded-md px-2 py-1 text-lg leading-none text-white/60 transition hover:bg-white/10 hover:text-white"
+            className="shrink-0 rounded-lg border border-white/[0.1] bg-white/[0.08] px-2.5 py-1 text-lg leading-none text-white/75 backdrop-blur-sm transition hover:border-white/[0.14] hover:bg-white/[0.14] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             aria-label="Close"
           >
             ×
           </button>
         </div>
-        <div className="max-h-[min(62dvh,380px)] overflow-y-auto overflow-x-hidden overscroll-contain px-4 py-4 sm:px-5">
+        <div className="max-h-[min(62dvh,400px)] overflow-y-auto overflow-x-hidden overscroll-contain bg-white/[0.02] px-4 py-4 sm:px-5">
           <div className="flex flex-col gap-4">
             <MonthlyYearBlocks matrix={matrix} />
           </div>
@@ -615,7 +620,7 @@ function CumulativeChart({
                   cx={hover.cx}
                   cy={hover.cy}
                   r={5}
-                  fill="#0f1117"
+                  fill="rgba(255,255,255,0.12)"
                   stroke={CHART_ACCENT}
                   strokeWidth={2}
                 />
@@ -625,7 +630,7 @@ function CumulativeChart({
 
           {hover && tip ? (
             <div
-              className="pointer-events-none absolute z-10 max-w-[min(260px,calc(100%-1rem))] rounded-md border border-white/[0.12] bg-[#1a1d26] px-2.5 py-2 text-left shadow-lg"
+              className="pointer-events-none absolute z-10 max-w-[min(260px,calc(100%-1rem))] rounded-lg border border-white/[0.14] bg-white/[0.12] px-3 py-2 text-left shadow-lg backdrop-blur-xl"
               style={{
                 left: `${(hover.cx / w) * 100}%`,
                 top: "8px",
@@ -682,7 +687,7 @@ function AccountCard({
   return (
     <div className={`${cardShell} flex flex-col`}>
       <p className={captionClass}>Live account &amp; equity</p>
-      <dl className="flex-1 space-y-0 divide-y divide-white/[0.08] text-sm">
+      <dl className="flex-1 space-y-0 divide-y divide-white/[0.1] text-sm">
         {rows.map((r) => (
           <div
             key={r.label}
@@ -742,7 +747,7 @@ function MonthlyIframeModal({
     <div className="fixed inset-0 z-[220] flex items-center justify-center p-4 sm:p-6">
       <button
         type="button"
-        className="absolute inset-0 bg-black/50 backdrop-blur-md"
+        className="dp-fx-modal-backdrop absolute inset-0"
         aria-label="Close"
         onClick={onClose}
       />
@@ -750,29 +755,29 @@ function MonthlyIframeModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative z-10 flex h-[min(82dvh,640px)] w-full max-w-2xl flex-col overflow-hidden rounded-[14px] border border-white/[0.12] bg-[#0f1117]/90 shadow-2xl backdrop-blur-xl"
+        className="relative z-10 flex h-[min(82dvh,640px)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl dp-fx-glass-panel"
       >
-        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.08] px-4 py-3 sm:px-5">
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.1] bg-white/[0.04] px-4 py-3.5 backdrop-blur-md sm:px-5">
           <h3
             id={titleId}
-            className="pr-2 font-[family-name:var(--font-dm-sans)] text-sm font-semibold text-white sm:text-base"
+            className="pr-2 font-[family-name:var(--font-syne)] text-sm font-bold tracking-tight text-white sm:text-base"
           >
             Monthly returns
           </h3>
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 rounded-md px-2 py-1 text-lg leading-none text-white/60 transition hover:bg-white/10 hover:text-white"
+            className="shrink-0 rounded-lg border border-white/[0.1] bg-white/[0.08] px-2.5 py-1 text-lg leading-none text-white/75 backdrop-blur-sm transition hover:border-white/[0.14] hover:bg-white/[0.14] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dp-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             aria-label="Close"
           >
             ×
           </button>
         </div>
-        <div className="min-h-0 flex-1 p-2 sm:p-3">
+        <div className="min-h-0 flex-1 bg-white/[0.02] p-2 sm:p-3">
           <iframe
             src={src}
             title={iframeTitle}
-            className="h-full min-h-[280px] w-full rounded-lg bg-black/40"
+            className="dp-fx-glass-inset h-full min-h-[280px] w-full rounded-xl"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             style={{ colorScheme: "dark" }}
@@ -803,11 +808,11 @@ function ProfitCard({
   return (
     <div className={`${cardShell} flex min-h-0 flex-1 flex-col`}>
       <p className={captionClass}>Cumulative profit</p>
-      <div className="flex min-h-0 w-full flex-1 flex-col rounded-[10px] bg-black/40 ring-1 ring-inset ring-white/[0.06]">
+      <div className="dp-fx-glass-inset flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-xl">
         <div className="relative min-h-[240px] w-full min-w-0 flex-1 basis-0 md:min-h-[400px] lg:min-h-[min(480px,58vh)]">
           <CumulativeChart series={series} currency={currency} />
         </div>
-        <p className="shrink-0 border-t border-white/[0.06] px-3 py-2 text-center text-xs leading-snug text-[var(--dp-muted)]">
+        <p className="shrink-0 border-t border-white/[0.1] bg-white/[0.03] px-3 py-2.5 text-center text-xs leading-snug text-[var(--dp-muted)] backdrop-blur-sm">
           <span className="text-white/75">{series[0]?.date}</span>
           <span className="text-white/35"> → </span>
           <span className="text-white/75">{last.date}</span>
@@ -901,7 +906,7 @@ function IframeFallback({ verify }: { verify: ApiPayload["verify"] | null }) {
           <p className={captionClass}>{f.label}</p>
           {opts?.hideVerify ? null : <VerifyOnFxBlue href={src} />}
           <div
-            className={`mt-3 overflow-hidden rounded-[10px] bg-[#0f1117] ring-1 ring-inset ring-[rgba(255,255,255,0.06)] ${boxMin}`}
+            className={`dp-fx-glass-inset mt-3 overflow-hidden rounded-xl ${boxMin}`}
           >
             <iframe
               src={src}
