@@ -782,7 +782,7 @@ const IFRAMES = [
   },
 ] as const;
 
-/** Mobile: account → profit → monthly. Desktop: profit | account | monthly */
+/** Mobile: account → profit → monthly. Desktop: profit | monthly | account */
 function WidgetGrid({
   profit,
   account,
@@ -795,8 +795,8 @@ function WidgetGrid({
   return (
     <div className="mx-auto mt-9 grid w-full max-w-6xl grid-cols-1 gap-6 sm:mt-11 md:grid-cols-3 md:items-start md:gap-5 lg:gap-6">
       <div className="order-2 min-w-0 md:order-1">{profit}</div>
-      <div className="order-1 min-w-0 md:order-2">{account}</div>
-      <div className="order-3 min-w-0 md:order-3">{monthly}</div>
+      <div className="order-3 min-w-0 md:order-2">{monthly}</div>
+      <div className="order-1 min-w-0 md:order-3">{account}</div>
     </div>
   );
 }
@@ -900,7 +900,18 @@ export function FxBlueTrackRecord() {
             <div className="mt-2 h-3 w-12 rounded bg-white/[0.08]" />
           </div>
           <div
-            className={`order-1 md:order-2 ${cardShell} flex flex-col`}
+            className={`order-3 md:order-2 ${cardShell} flex flex-col`}
+          >
+            <div className="mb-3 h-3 w-32 rounded bg-white/[0.08]" />
+            <div className="flex flex-col gap-3">
+              <div className="h-24 w-full rounded-lg bg-white/[0.06]" />
+              <div className="h-24 w-full rounded-lg bg-white/[0.06]" />
+            </div>
+            <div className="mt-3 h-8 w-full rounded-lg bg-white/[0.06]" />
+            <div className="mt-2 h-3 w-12 rounded bg-white/[0.08]" />
+          </div>
+          <div
+            className={`order-1 md:order-3 ${cardShell} flex flex-col`}
           >
             <div className="mb-3 h-3 w-40 rounded bg-white/[0.08]" />
             <div className="flex flex-col gap-2">
@@ -912,17 +923,6 @@ export function FxBlueTrackRecord() {
               ))}
             </div>
             <div className="mt-3 h-3 w-12 rounded bg-white/[0.08]" />
-          </div>
-          <div
-            className={`order-3 md:order-3 ${cardShell} flex flex-col`}
-          >
-            <div className="mb-3 h-3 w-32 rounded bg-white/[0.08]" />
-            <div className="flex flex-col gap-3">
-              <div className="h-24 w-full rounded-lg bg-white/[0.06]" />
-              <div className="h-24 w-full rounded-lg bg-white/[0.06]" />
-            </div>
-            <div className="mt-3 h-8 w-full rounded-lg bg-white/[0.06]" />
-            <div className="mt-2 h-3 w-12 rounded bg-white/[0.08]" />
           </div>
         </div>
       ) : showCustom && payload ? (
