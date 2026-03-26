@@ -23,7 +23,7 @@ export default async function BasicCoursePage() {
       <PageBackgroundGlow variant="basicCourse" />
       {process.env.NODE_ENV === "development" ? <DevScrollGrid /> : null}
       <main className="relative z-[1] mx-auto min-w-0 max-w-6xl px-3 pb-16 text-center sm:px-4 sm:pb-24 md:px-6">
-        <h1 className="block pb-3 font-[family-name:var(--font-syne)] text-[1.65rem] font-bold leading-[1.28] tracking-tight text-white min-[400px]:text-[1.85rem] sm:pb-4 sm:text-4xl sm:leading-[1.26] md:pb-5 md:text-6xl md:leading-[1.24] lg:text-7xl lg:leading-[1.22]">
+        <h1 className="transform-gpu pb-4 font-[family-name:var(--font-syne)] text-[1.65rem] font-bold leading-normal tracking-tight text-white min-[400px]:text-[1.85rem] sm:pb-5 sm:text-4xl md:pb-8 md:text-6xl md:leading-[1.35] lg:text-7xl lg:leading-[1.32] after:block after:h-2 after:content-[''] sm:after:h-2.5 md:after:h-3">
           Basic Forex training
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-6 sm:text-lg md:text-xl">

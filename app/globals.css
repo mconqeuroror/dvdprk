@@ -2,8 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Root must not mix overflow-x: hidden|clip with overflow-y: visible (initial),
+ * or engines change overflow-y and can clip descenders on large display type.
+ */
 html {
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 :root {
