@@ -4,6 +4,7 @@ import { ImageMarqueeRows } from "@/components/ImageMarqueeRows";
 import { DevScrollGrid } from "@/components/DevScrollGrid";
 import { PageBackgroundGlow } from "@/components/PageBackgroundGlow";
 import { SiteFooter } from "@/components/SiteFooter";
+import { WHOP_JOIN_URL } from "@/lib/join-url";
 import { getSiteConfig } from "@/lib/site-config";
 
 export const dynamic = "force-dynamic";
@@ -69,7 +70,12 @@ export default async function HomePage() {
         />
 
         <div className="mx-auto mt-8 flex justify-center px-3 sm:mt-10 sm:px-4">
-          <Link href="/basic-course" className={basicCourseCtaClass}>
+          <Link
+            href={WHOP_JOIN_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={basicCourseCtaClass}
+          >
             Join now!
           </Link>
         </div>
