@@ -70,13 +70,66 @@ function formatPct(x: number) {
   return `${s}${x.toFixed(2)}%`;
 }
 
-function formatAxisProfit(n: number) {
+/** Y-axis labels like $0, $200K, $1.2M */
+function formatAxisDollar(n: number): string {
   const sign = n < 0 ? "-" : "";
   const v = Math.abs(n);
-  if (v >= 1_000_000) return `${sign}${(v / 1_000_000).toFixed(1)}M`;
-  if (v >= 10_000) return `${sign}${Math.round(v / 1000)}k`;
-  if (v >= 1000) return `${sign}${(v / 1000).toFixed(1)}k`;
-  return `${sign}${Math.round(v)}`;
+  if (v >= 1_000_000) {
+    const m = v / 1_000_000;
+    const t = m >= 10 ? m.toFixed(0) : m.toFixed(1).replace(/\.0$/, "");
+    return `${sign}$${t}M`;
+  }
+  if (v >= 1000) return `${sign}$${Math.round(v / 1000)}K`;
+  return `${sign}$${Math.round(v)}`;
+}
+
+function parseChartDate(s: string): Date | null {
+  const t = Date.parse(s);
+  if (!Number.isNaN(t)) return new Date(t);
+  const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s.trim());
+  if (m) return new Date(Number(m[3]), Number(m[1]) - 1, Number(m[2]));
+  return null;
+}
+
+function yearFromPoint(dateStr: string): string {
+  const d = parseChartDate(dateStr);
+  return d ? String(d.getFullYear()) : dateStr.slice(-4);
+}
+
+/** Tick values spanning min–max with round steps */
+function niceProfitTicks(minP: number, maxP: number, maxTicks: number): number[] {
+  const span = maxP - minP || 1;
+  const rough = span / Math.max(maxTicks - 1, 1);
+  const pow = 10 ** Math.floor(Math.log10(rough));
+  const err = rough / pow;
+  let nice = pow;
+  if (err >= 7.5) nice = 10 * pow;
+  else if (err >= 3.5) nice = 5 * pow;
+  else if (err >= 1.5) nice = 2 * pow;
+  const lo = Math.floor(minP / nice) * nice;
+  const hi = Math.ceil(maxP / nice) * nice;
+  const ticks: number[] = [];
+  for (let v = lo; v <= hi + nice * 0.01; v += nice) ticks.push(v);
+  if (ticks.length < 2) return [minP, maxP];
+  return ticks;
+}
+
+function smoothPathThrough(pts: { x: number; y: number }[]): string {
+  if (pts.length === 0) return "";
+  if (pts.length === 1) return `M ${pts[0].x} ${pts[0].y}`;
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[Math.min(pts.length - 1, i + 2)];
+    const cp1x = p1.x + (p2.x - p0.x) / 6;
+    const cp1y = p1.y + (p2.y - p0.y) / 6;
+    const cp2x = p2.x - (p3.x - p1.x) / 6;
+    const cp2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+  }
+  return d;
 }
 
 function buildMonthMatrix(months: FxBlueMonthPoint[]) {
@@ -95,33 +148,96 @@ const PREVIEW_YEAR_COUNT = 3;
 
 type YearMatrixRow = [number, (number | null)[]];
 
+function maxAbsMonthlyInMatrix(matrix: YearMatrixRow[]): number {
+  let m = 0;
+  for (const [, cells] of matrix) {
+    for (const v of cells) {
+      if (v !== null) m = Math.max(m, Math.abs(v));
+    }
+  }
+  return m > 0 ? m : 100;
+}
+
+function MonthReturnCell({
+  value,
+  label,
+  scaleMax,
+}: {
+  value: number | null;
+  label: string;
+  scaleMax: number;
+}) {
+  const cellClass =
+    "flex h-11 w-full min-w-0 items-center justify-center rounded-md border px-0.5 text-center text-[0.62rem] font-semibold tabular-nums leading-none text-white sm:h-12 sm:text-[0.68rem]";
+  if (value === null) {
+    return (
+      <div className="flex min-w-0 flex-col gap-1.5">
+        <div className="flex h-3.5 items-center justify-center text-[0.62rem] font-bold uppercase tracking-[0.12em] text-white/65 sm:h-4 sm:text-[0.65rem]">
+          {label}
+        </div>
+        <div
+          className={`${cellClass} border-white/[0.1] bg-white/[0.05] text-white/35`}
+        >
+          —
+        </div>
+      </div>
+    );
+  }
+  const t = Math.min(1, Math.abs(value) / scaleMax);
+  const alpha = 0.28 + t * 0.62;
+  if (value >= 0) {
+    return (
+      <div className="flex min-w-0 flex-col gap-1.5">
+        <div className="flex h-3.5 items-center justify-center text-[0.62rem] font-bold uppercase tracking-[0.12em] text-white/65 sm:h-4 sm:text-[0.65rem]">
+          {label}
+        </div>
+        <div
+          className={`${cellClass} border-emerald-400/25`}
+          style={{ backgroundColor: `rgba(5, 150, 105, ${alpha})` }}
+        >
+          <span className="max-w-full truncate">{formatPct(value)}</span>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="flex min-w-0 flex-col gap-1.5">
+      <div className="flex h-3.5 items-center justify-center text-[0.62rem] font-bold uppercase tracking-[0.12em] text-white/65 sm:h-4 sm:text-[0.65rem]">
+        {label}
+      </div>
+      <div
+        className={`${cellClass} border-red-400/25`}
+        style={{ backgroundColor: `rgba(220, 38, 38, ${alpha})` }}
+      >
+        <span className="max-w-full truncate">{formatPct(value)}</span>
+      </div>
+    </div>
+  );
+}
+
 function MonthlyYearBlocks({ matrix }: { matrix: YearMatrixRow[] }) {
+  const scaleMax = maxAbsMonthlyInMatrix(matrix);
   return (
     <>
       {matrix.map(([year, cells]) => (
-        <div key={year}>
-          <p className="mb-2 text-xs font-semibold text-white">{year}</p>
-          <div className="grid grid-cols-6 gap-x-1 gap-y-2">
+        <section
+          key={year}
+          className="rounded-lg border border-white/[0.08] bg-black/25 p-3 sm:p-3.5"
+        >
+          <h4 className="mb-3 border-b border-white/[0.1] pb-2 text-left text-sm font-semibold tracking-tight text-white">
+            {year}
+          </h4>
+          <div className="grid grid-cols-6 gap-2 sm:gap-2.5">
             {cells.map((v, i) => (
-              <div key={i} className="min-w-0 text-center">
-                <div className="text-[0.55rem] uppercase text-[var(--dp-muted)]">
-                  {MON[i]}
-                </div>
-                <div
-                  className={
-                    v === null
-                      ? "mt-0.5 text-[0.65rem] text-white/25"
-                      : v >= 0
-                        ? "mt-0.5 rounded bg-emerald-500/20 px-0.5 py-0.5 text-[0.65rem] font-medium leading-tight text-emerald-200"
-                        : "mt-0.5 rounded bg-red-500/20 px-0.5 py-0.5 text-[0.65rem] font-medium leading-tight text-red-200"
-                  }
-                >
-                  {v === null ? "—" : formatPct(v)}
-                </div>
-              </div>
+              <MonthReturnCell
+                key={i}
+                label={MON[i]!}
+                value={v}
+                scaleMax={scaleMax}
+              />
             ))}
           </div>
-        </div>
+        </section>
       ))}
     </>
   );
@@ -194,119 +310,216 @@ function MonthlyAllYearsModal({
   );
 }
 
-function CumulativeChart({ series }: { series: FxBlueCumulativePoint[] }) {
+const CHART_ACCENT = "rgb(98, 67, 255)";
+
+function CumulativeChart({
+  series,
+  currency,
+}: {
+  series: FxBlueCumulativePoint[];
+  currency: string;
+}) {
   const areaGradId = `${useId().replace(/:/g, "")}-area`;
+  const [hover, setHover] = useState<{
+    idx: number;
+    cx: number;
+    cy: number;
+  } | null>(null);
+
   const w = 640;
-  const h = 260;
-  const padL = 52;
-  const padR = 14;
-  const padT = 14;
-  const padB = 36;
+  const h = 288;
+  const padL = 62;
+  const padR = 16;
+  const padT = 16;
+  const padB = 44;
+  const inset = 4;
   const cw = w - padL - padR;
-  const ch = h - padT - padB;
+  const ch = h - padT - padB - inset * 2;
+  const plotTop = padT + inset;
+  const plotBottom = padT + inset + ch;
+  const baseY = plotBottom;
 
   const profits = series.map((s) => s.profit);
-  const minP = Math.min(...profits);
-  const maxP = Math.max(...profits);
-  const range = maxP - minP || 1;
+  const rawMin = Math.min(...profits);
+  const rawMax = Math.max(...profits);
+  const span = rawMax - rawMin || 1;
+  const minP = rawMin - span * 0.04;
+  const maxP = rawMax + span * 0.04;
   const n = series.length;
 
-  const yTicks = 4;
-  const yVals: number[] = [];
-  for (let i = 0; i <= yTicks; i++) {
-    yVals.push(minP + (range * i) / yTicks);
-  }
+  const yVals = niceProfitTicks(minP, maxP, 7);
+  const scaleMin = Math.min(minP, ...yVals);
+  const scaleMax = Math.max(maxP, ...yVals);
+  const yDomain = scaleMax - scaleMin || 1;
 
+  const xTickWant = 6;
   const xTickIdx: number[] = [];
-  const want = 5;
-  for (let i = 0; i < want; i++) {
-    xTickIdx.push(Math.round((i / Math.max(want - 1, 1)) * Math.max(n - 1, 0)));
+  for (let i = 0; i < xTickWant; i++) {
+    xTickIdx.push(
+      Math.round((i / Math.max(xTickWant - 1, 1)) * Math.max(n - 1, 0)),
+    );
   }
   const xUnique = [...new Set(xTickIdx)].sort((a, b) => a - b);
 
   const pts = series.map((s, i) => {
     const x = padL + (i / Math.max(n - 1, 1)) * cw;
-    const y = padT + (1 - (s.profit - minP) / range) * ch;
+    const y =
+      plotTop +
+      (1 - (s.profit - scaleMin) / yDomain) * (plotBottom - plotTop);
     return { x, y, date: s.date, profit: s.profit };
   });
 
-  const lineD = pts.map((p) => `${p.x},${p.y}`).join(" ");
-  const areaD = `M ${pts[0]!.x},${h - padB} L ${pts.map((p) => `${p.x},${p.y}`).join(" L ")} L ${pts[pts.length - 1]!.x},${h - padB} Z`;
+  const smoothLine = smoothPathThrough(pts);
+  const first = pts[0]!;
+  const last = pts[pts.length - 1]!;
+  const areaD = `${smoothLine} L ${last.x} ${baseY} L ${first.x} ${baseY} Z`;
+
+  const nearestIndex = (svgX: number) => {
+    const t = (svgX - padL) / cw;
+    const idx = Math.round(t * Math.max(n - 1, 0));
+    return Math.max(0, Math.min(n - 1, idx));
+  };
+
+  const onSvgPointer = (e: React.MouseEvent<SVGSVGElement>) => {
+    const svg = e.currentTarget;
+    const rect = svg.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * w;
+    const idx = nearestIndex(x);
+    const p = pts[idx];
+    if (!p) return;
+    setHover({ idx, cx: p.x, cy: p.y });
+  };
+
+  const tip = hover ? series[hover.idx] : null;
 
   return (
-    <svg
-      viewBox={`0 0 ${w} ${h}`}
-      className="h-full w-full max-w-full text-[var(--dp-muted)]"
-      role="img"
-      aria-label="Cumulative profit over time"
-    >
-      <defs>
-        <linearGradient id={areaGradId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="rgb(98, 67, 255)" stopOpacity="0.32" />
-          <stop offset="100%" stopColor="rgb(98, 67, 255)" stopOpacity="0" />
-        </linearGradient>
-      </defs>
+    <div className="relative w-full">
+      <svg
+        viewBox={`0 0 ${w} ${h}`}
+        className="h-auto w-full max-w-full text-[var(--dp-muted)]"
+        style={{ aspectRatio: `${w} / ${h}` }}
+        role="img"
+        aria-label="Cumulative profit over time"
+        onMouseMove={onSvgPointer}
+        onMouseLeave={() => setHover(null)}
+      >
+        <defs>
+          <linearGradient id={areaGradId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={CHART_ACCENT} stopOpacity="0.2" />
+            <stop offset="100%" stopColor={CHART_ACCENT} stopOpacity="0" />
+          </linearGradient>
+        </defs>
 
-      {yVals.map((yv, i) => {
-        const y = padT + (1 - (yv - minP) / range) * ch;
-        return (
-          <g key={i}>
+        {yVals.map((yv, i) => {
+          const y =
+            plotTop +
+            (1 - (yv - scaleMin) / yDomain) * (plotBottom - plotTop);
+          return (
+            <g key={`y-${i}-${yv}`}>
+              <line
+                x1={padL}
+                y1={y}
+                x2={w - padR}
+                y2={y}
+                stroke="rgba(255,255,255,0.07)"
+                strokeWidth={1}
+              />
+              <text
+                x={padL - 8}
+                y={y + 3.5}
+                textAnchor="end"
+                className="fill-[var(--dp-muted)]"
+                style={{ fontSize: 10 }}
+              >
+                {formatAxisDollar(yv)}
+              </text>
+            </g>
+          );
+        })}
+
+        <path d={areaD} fill={`url(#${areaGradId})`} />
+        <path
+          d={smoothLine}
+          fill="none"
+          stroke={CHART_ACCENT}
+          strokeWidth={2.25}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        {xUnique.map((idx, i) => {
+          const p = pts[idx];
+          if (!p) return null;
+          const yr = yearFromPoint(p.date);
+          const prevIdx = i > 0 ? xUnique[i - 1] : -1;
+          const prevYr =
+            prevIdx >= 0 && pts[prevIdx]
+              ? yearFromPoint(pts[prevIdx]!.date)
+              : null;
+          const showYearLabel = yr !== prevYr;
+          return (
+            <g key={`x-${idx}`}>
+              <line
+                x1={p.x}
+                y1={plotTop}
+                x2={p.x}
+                y2={plotBottom}
+                stroke="rgba(255,255,255,0.04)"
+                strokeWidth={1}
+              />
+              {showYearLabel ? (
+                <text
+                  x={p.x}
+                  y={h - 14}
+                  textAnchor="middle"
+                  className="fill-[var(--dp-muted)]"
+                  style={{ fontSize: 10 }}
+                >
+                  {yr}
+                </text>
+              ) : null}
+            </g>
+          );
+        })}
+
+        {hover && tip ? (
+          <g pointerEvents="none">
             <line
-              x1={padL}
-              y1={y}
-              x2={w - padR}
-              y2={y}
-              stroke="rgba(255,255,255,0.06)"
+              x1={hover.cx}
+              y1={plotTop}
+              x2={hover.cx}
+              y2={plotBottom}
+              stroke="rgba(255,255,255,0.12)"
               strokeWidth={1}
             />
-            <text
-              x={padL - 6}
-              y={y + 3}
-              textAnchor="end"
-              className="fill-[var(--dp-muted)]"
-              style={{ fontSize: 9 }}
-            >
-              {formatAxisProfit(yv)}
-            </text>
-          </g>
-        );
-      })}
-
-      <path d={areaD} fill={`url(#${areaGradId})`} />
-      <polyline
-        fill="none"
-        stroke="rgb(129, 140, 248)"
-        strokeWidth="2"
-        points={lineD}
-      />
-
-      {xUnique.map((idx) => {
-        const p = pts[idx];
-        if (!p) return null;
-        const short = p.date.length > 9 ? p.date.slice(0, 8) + "…" : p.date;
-        return (
-          <g key={idx}>
-            <line
-              x1={p.x}
-              y1={padT}
-              x2={p.x}
-              y2={h - padB}
-              stroke="rgba(255,255,255,0.04)"
-              strokeWidth={1}
+            <circle
+              cx={hover.cx}
+              cy={hover.cy}
+              r={5}
+              fill="#0f1117"
+              stroke={CHART_ACCENT}
+              strokeWidth={2}
             />
-            <text
-              x={p.x}
-              y={h - 10}
-              textAnchor="middle"
-              className="fill-[var(--dp-muted)]"
-              style={{ fontSize: 8 }}
-            >
-              {short}
-            </text>
           </g>
-        );
-      })}
-    </svg>
+        ) : null}
+      </svg>
+
+      {hover && tip ? (
+        <div
+          className="pointer-events-none absolute z-10 max-w-[min(240px,calc(100%-1rem))] rounded-md border border-white/[0.12] bg-[#1a1d26] px-2.5 py-2 text-left shadow-lg"
+          style={{
+            left: `${(hover.cx / w) * 100}%`,
+            top: "6px",
+            transform: "translateX(-50%)",
+          }}
+        >
+          <p className="text-[0.65rem] font-medium text-white/90">{tip.date}</p>
+          <p className="mt-0.5 text-[0.7rem] tabular-nums text-[var(--dp-accent)]">
+            {formatMoney(tip.profit, currency)}
+          </p>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -342,7 +555,7 @@ function AccountCard({
     ];
 
   return (
-    <div className={`${cardShell} flex flex-col`}>
+    <div className={`${cardShell} flex h-full min-h-0 flex-col`}>
       <p className={captionClass}>Live account &amp; equity</p>
       <dl className="flex-1 space-y-0 divide-y divide-white/[0.08] text-sm">
         {rows.map((r) => (
@@ -385,7 +598,7 @@ function MonthlyTable({
   const showViewAll = fullMatrix.length > PREVIEW_YEAR_COUNT;
 
   return (
-    <div className={`${cardShell} ${DATA_PANEL_MIN_H}`}>
+    <div className={`${cardShell} ${DATA_PANEL_MIN_H} h-full`}>
       <p className={captionClass}>Monthly returns</p>
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden">
         <MonthlyYearBlocks matrix={previewMatrix} />
@@ -426,7 +639,7 @@ function ProfitCard({
 }) {
   const last = series[series.length - 1]!;
   return (
-    <div className={`${cardShell} ${DATA_PANEL_MIN_H}`}>
+    <div className={`${cardShell} ${DATA_PANEL_MIN_H} h-full`}>
       <p className={captionClass}>Cumulative profit</p>
       <div className="flex min-h-0 flex-1 flex-col rounded-[10px] bg-black/40 ring-1 ring-inset ring-white/[0.06]">
         <div className="min-h-[220px] flex-1 md:min-h-[280px]">
@@ -480,7 +693,7 @@ function WidgetGrid({
   monthly: React.ReactNode;
 }) {
   return (
-    <div className="mx-auto mt-9 grid w-full max-w-6xl grid-cols-1 gap-6 sm:mt-11 md:grid-cols-3 md:items-start md:gap-5 lg:gap-6">
+    <div className="mx-auto mt-9 grid w-full max-w-6xl grid-cols-1 gap-6 sm:mt-11 md:grid-cols-3 md:items-stretch md:gap-5 lg:gap-6">
       <div className="order-2 min-w-0 md:order-1">{profit}</div>
       <div className="order-1 min-w-0 md:order-2">{account}</div>
       <div className="order-3 min-w-0 md:order-3">{monthly}</div>
@@ -502,9 +715,9 @@ function IframeFallback({ verify }: { verify: ApiPayload["verify"] | null }) {
     return (
       <figure
         key={f.widgetKey}
-        className={`w-full font-[family-name:var(--font-dm-sans)] ${DATA_PANEL_MIN_H}`}
+        className={`w-full font-[family-name:var(--font-dm-sans)] ${DATA_PANEL_MIN_H} h-full`}
       >
-        <div className={`${cardShell} flex h-full flex-col`}>
+        <div className={`${cardShell} flex h-full min-h-0 flex-col`}>
           <p className={captionClass}>{f.label}</p>
           <VerifyOnFxBlue href={src} />
           <div className="mt-3 min-h-[200px] flex-1 overflow-hidden rounded-[10px] bg-[#0f1117] ring-1 ring-inset ring-[rgba(255,255,255,0.06)] md:min-h-[280px]">
@@ -577,10 +790,40 @@ export function FxBlueTrackRecord() {
       </p>
 
       {!payload && !loadError ? (
-        <div className="mx-auto mt-9 grid w-full max-w-6xl animate-pulse grid-cols-1 gap-6 md:grid-cols-3">
-          <div className="order-2 h-64 rounded-[10px] bg-white/[0.06] md:order-1 md:h-[320px]" />
-          <div className="order-1 h-48 rounded-[10px] bg-white/[0.06] md:order-2 md:h-[320px]" />
-          <div className="order-3 h-64 rounded-[10px] bg-white/[0.06] md:h-[320px]" />
+        <div className="mx-auto mt-9 grid w-full max-w-6xl animate-pulse grid-cols-1 gap-6 md:grid-cols-3 md:items-stretch md:gap-5 lg:gap-6">
+          <div
+            className={`order-2 min-h-0 md:order-1 ${cardShell} flex min-h-[320px] flex-col md:min-h-[400px] lg:min-h-[420px]`}
+          >
+            <div className="mb-3 h-3 w-28 rounded bg-white/[0.08]" />
+            <div className="mb-3 aspect-[640/288] w-full rounded-lg bg-white/[0.06]" />
+            <div className="mt-auto h-8 w-full rounded bg-white/[0.05]" />
+            <div className="mt-2 h-3 w-12 rounded bg-white/[0.08]" />
+          </div>
+          <div
+            className={`order-1 min-h-0 md:order-2 ${cardShell} flex min-h-[320px] flex-col md:min-h-[400px] lg:min-h-[420px]`}
+          >
+            <div className="mb-3 h-3 w-40 rounded bg-white/[0.08]" />
+            <div className="flex flex-1 flex-col gap-2">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-4 w-full rounded bg-white/[0.06]"
+                />
+              ))}
+            </div>
+            <div className="mt-3 h-3 w-12 rounded bg-white/[0.08]" />
+          </div>
+          <div
+            className={`order-3 min-h-0 md:order-3 ${cardShell} flex min-h-[320px] flex-col md:min-h-[400px] lg:min-h-[420px]`}
+          >
+            <div className="mb-3 h-3 w-32 rounded bg-white/[0.08]" />
+            <div className="flex flex-1 flex-col gap-3">
+              <div className="h-24 w-full rounded-lg bg-white/[0.06]" />
+              <div className="h-24 w-full rounded-lg bg-white/[0.06]" />
+            </div>
+            <div className="mt-3 h-8 w-full rounded-lg bg-white/[0.06]" />
+            <div className="mt-2 h-3 w-12 rounded bg-white/[0.08]" />
+          </div>
         </div>
       ) : showCustom && payload ? (
         <WidgetGrid
