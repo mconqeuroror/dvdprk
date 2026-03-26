@@ -28,6 +28,11 @@ export default async function HomePage() {
     <div className="relative min-h-screen overflow-hidden pt-[max(1.25rem,env(safe-area-inset-top))] sm:pt-10 md:pt-12">
       <PageBackgroundGlow variant="home" />
       {process.env.NODE_ENV === "development" ? <DevScrollGrid /> : null}
+      {/* Subtle accent radial — mirrors the marquee-center treatment; anchors bottom-right vs top-left orb */}
+      <div
+        className="pointer-events-none absolute bottom-0 right-0 z-0 h-[min(78vh,640px)] w-[min(96vw,820px)] bg-[radial-gradient(ellipse_68%_52%_at_76%_74%,rgba(98,67,255,0.13)_0%,rgba(98,67,255,0.04)_38%,transparent_72%)] sm:h-[min(70vh,680px)] sm:w-[min(88vw,900px)]"
+        aria-hidden
+      />
 
       <main className="relative z-[1] min-w-0 pb-16 text-center sm:pb-24">
         <div className="mx-auto max-w-6xl px-3 sm:px-4 md:px-6">
