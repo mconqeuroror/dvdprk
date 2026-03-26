@@ -43,10 +43,6 @@ const cardShell =
 const captionClass =
   "mb-3 text-[11px] font-medium uppercase leading-snug tracking-[0.1em] text-[rgba(243,240,254,0.5)] md:mb-4 md:text-xs";
 
-/** Same min height for cumulative + monthly columns on desktop */
-const DATA_PANEL_MIN_H =
-  "flex min-h-0 flex-col md:min-h-[400px] lg:min-h-[420px]";
-
 function VerifyOnFxBlue({ href }: { href: string }) {
   return (
     <a
@@ -231,7 +227,8 @@ function buildMonthMatrix(months: FxBlueMonthPoint[]) {
 
 const MON = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
 
-const PREVIEW_YEAR_COUNT = 3;
+/** Desktop monthly card preview (mobile uses current year only) */
+const PREVIEW_DESKTOP_YEAR_COUNT = 2;
 
 type YearMatrixRow = [number, (number | null)[]];
 
@@ -366,7 +363,7 @@ function MonthlyAllYearsModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative z-10 flex max-h-[min(88vh,720px)] w-full max-w-lg flex-col overflow-hidden rounded-[12px] border border-white/[0.1] bg-[#0f1117] shadow-2xl"
+        className="relative z-10 flex w-full max-w-lg flex-col overflow-hidden rounded-[12px] border border-white/[0.1] bg-[#0f1117] shadow-2xl max-h-[min(85dvh,520px)]"
       >
         <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.08] px-4 py-3 sm:px-5">
           <h3
@@ -384,7 +381,7 @@ function MonthlyAllYearsModal({
             ×
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 sm:px-5">
+        <div className="max-h-[min(62dvh,380px)] overflow-y-auto overflow-x-hidden overscroll-contain px-4 py-4 sm:px-5">
           <div className="flex flex-col gap-4">
             <MonthlyYearBlocks matrix={matrix} />
           </div>
@@ -493,7 +490,7 @@ function CumulativeChart({
   const tip = hover ? series[hover.idx] : null;
 
   return (
-    <div ref={wrapRef} className="relative h-full min-h-0 w-full min-w-0 flex-1">
+    <div ref={wrapRef} className="relative h-full min-h-0 w-full min-w-0">
       {ready ? (
         <>
           <svg
@@ -651,7 +648,7 @@ function AccountCard({
     ];
 
   return (
-    <div className={`${cardShell} flex h-full min-h-0 flex-col`}>
+    <div className={`${cardShell} flex flex-col`}>
       <p className={captionClass}>Live account &amp; equity</p>
       <dl className="flex-1 space-y-0 divide-y divide-white/[0.08] text-sm">
         {rows.map((r) => (
@@ -695,15 +692,15 @@ function MonthlyTable({
         const thisYear = fullMatrix.find(([y]) => y === currentYear);
         return thisYear ? [thisYear] : fullMatrix.slice(0, 1);
       })()
-    : fullMatrix.slice(0, PREVIEW_YEAR_COUNT);
+    : fullMatrix.slice(0, PREVIEW_DESKTOP_YEAR_COUNT);
   const [modalOpen, setModalOpen] = useState(false);
   const modalTitleId = useId().replace(/:/g, "");
   const showViewAll = fullMatrix.length > previewMatrix.length;
 
   return (
-    <div className={`${cardShell} ${DATA_PANEL_MIN_H} h-full`}>
+    <div className={`${cardShell} flex flex-col`}>
       <p className={captionClass}>Monthly returns</p>
-      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden">
+      <div className="flex flex-col gap-4 overflow-x-hidden">
         <MonthlyYearBlocks matrix={previewMatrix} />
       </div>
       {showViewAll ? (
@@ -742,13 +739,13 @@ function ProfitCard({
 }) {
   const last = series[series.length - 1]!;
   return (
-    <div className={`${cardShell} ${DATA_PANEL_MIN_H} h-full`}>
+    <div className={`${cardShell} flex flex-col`}>
       <p className={captionClass}>Cumulative profit</p>
-      <div className="flex min-h-0 flex-1 flex-col rounded-[10px] bg-black/40 ring-1 ring-inset ring-white/[0.06]">
-        <div className="relative flex w-full min-w-0 flex-1 basis-0 flex-col min-h-[220px] md:min-h-[280px]">
+      <div className="flex flex-col rounded-[10px] bg-black/40 ring-1 ring-inset ring-white/[0.06]">
+        <div className="relative h-[220px] w-full min-w-0 md:h-[280px]">
           <CumulativeChart series={series} currency={currency} />
         </div>
-        <p className="mt-auto border-t border-white/[0.06] px-3 py-2 text-center text-xs leading-snug text-[var(--dp-muted)]">
+        <p className="border-t border-white/[0.06] px-3 py-2 text-center text-xs leading-snug text-[var(--dp-muted)]">
           <span className="text-white/75">{series[0]?.date}</span>
           <span className="text-white/35"> → </span>
           <span className="text-white/75">{last.date}</span>
@@ -796,7 +793,7 @@ function WidgetGrid({
   monthly: React.ReactNode;
 }) {
   return (
-    <div className="mx-auto mt-9 grid w-full max-w-6xl grid-cols-1 gap-6 sm:mt-11 md:grid-cols-3 md:items-stretch md:gap-5 lg:gap-6">
+    <div className="mx-auto mt-9 grid w-full max-w-6xl grid-cols-1 gap-6 sm:mt-11 md:grid-cols-3 md:items-start md:gap-5 lg:gap-6">
       <div className="order-2 min-w-0 md:order-1">{profit}</div>
       <div className="order-1 min-w-0 md:order-2">{account}</div>
       <div className="order-3 min-w-0 md:order-3">{monthly}</div>
@@ -818,9 +815,9 @@ function IframeFallback({ verify }: { verify: ApiPayload["verify"] | null }) {
     return (
       <figure
         key={f.widgetKey}
-        className={`w-full font-[family-name:var(--font-dm-sans)] ${DATA_PANEL_MIN_H} h-full`}
+        className="w-full font-[family-name:var(--font-dm-sans)]"
       >
-        <div className={`${cardShell} flex h-full min-h-0 flex-col`}>
+        <div className={`${cardShell} flex flex-col`}>
           <p className={captionClass}>{f.label}</p>
           <VerifyOnFxBlue href={src} />
           <div className="mt-3 min-h-[200px] flex-1 overflow-hidden rounded-[10px] bg-[#0f1117] ring-1 ring-inset ring-[rgba(255,255,255,0.06)] md:min-h-[280px]">
@@ -893,20 +890,20 @@ export function FxBlueTrackRecord() {
       </p>
 
       {!payload && !loadError ? (
-        <div className="mx-auto mt-9 grid w-full max-w-6xl animate-pulse grid-cols-1 gap-6 md:grid-cols-3 md:items-stretch md:gap-5 lg:gap-6">
+        <div className="mx-auto mt-9 grid w-full max-w-6xl animate-pulse grid-cols-1 gap-6 md:grid-cols-3 md:items-start md:gap-5 lg:gap-6">
           <div
-            className={`order-2 min-h-0 md:order-1 ${cardShell} flex min-h-[320px] flex-col md:min-h-[400px] lg:min-h-[420px]`}
+            className={`order-2 md:order-1 ${cardShell} flex flex-col`}
           >
             <div className="mb-3 h-3 w-28 rounded bg-white/[0.08]" />
-            <div className="mb-3 aspect-[640/288] w-full rounded-lg bg-white/[0.06]" />
-            <div className="mt-auto h-8 w-full rounded bg-white/[0.05]" />
+            <div className="mb-3 h-[220px] w-full rounded-lg bg-white/[0.06] md:h-[280px]" />
+            <div className="h-8 w-full rounded bg-white/[0.05]" />
             <div className="mt-2 h-3 w-12 rounded bg-white/[0.08]" />
           </div>
           <div
-            className={`order-1 min-h-0 md:order-2 ${cardShell} flex min-h-[320px] flex-col md:min-h-[400px] lg:min-h-[420px]`}
+            className={`order-1 md:order-2 ${cardShell} flex flex-col`}
           >
             <div className="mb-3 h-3 w-40 rounded bg-white/[0.08]" />
-            <div className="flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-2">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div
                   key={i}
@@ -917,10 +914,10 @@ export function FxBlueTrackRecord() {
             <div className="mt-3 h-3 w-12 rounded bg-white/[0.08]" />
           </div>
           <div
-            className={`order-3 min-h-0 md:order-3 ${cardShell} flex min-h-[320px] flex-col md:min-h-[400px] lg:min-h-[420px]`}
+            className={`order-3 md:order-3 ${cardShell} flex flex-col`}
           >
             <div className="mb-3 h-3 w-32 rounded bg-white/[0.08]" />
-            <div className="flex flex-1 flex-col gap-3">
+            <div className="flex flex-col gap-3">
               <div className="h-24 w-full rounded-lg bg-white/[0.06]" />
               <div className="h-24 w-full rounded-lg bg-white/[0.06]" />
             </div>
