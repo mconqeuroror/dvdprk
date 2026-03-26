@@ -146,6 +146,16 @@ export async function saveSiteConfigAction(formData: FormData) {
 
   const config: SiteConfig = {
     ...current,
+    homeHeroTitlePrimary: String(
+      formData.get("homeHeroTitlePrimary") ?? "",
+    ).trim(),
+    homeHeroTitleMuted: String(formData.get("homeHeroTitleMuted") ?? ""),
+    homeHeroDescription: String(
+      formData.get("homeHeroDescription") ?? "",
+    ).trim(),
+    homeStudentResultsHeading: String(
+      formData.get("homeStudentResultsHeading") ?? "",
+    ).trim(),
     freeCourseModules: normalizeFreeCourseModules(freeCourseModules),
   };
   await writeSiteConfig(config);

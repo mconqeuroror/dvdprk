@@ -31,13 +31,15 @@ export default async function HomePage() {
       <main className="relative z-[1] min-w-0 pb-16 text-center sm:pb-24">
         <div className="mx-auto max-w-6xl px-3 sm:px-4 md:px-6">
           <h1 className="mx-auto max-w-4xl font-[family-name:var(--font-syne)] text-[1.65rem] font-bold leading-[1.08] tracking-tight text-white min-[400px]:text-[1.85rem] sm:text-4xl sm:leading-[1.05] md:text-6xl lg:text-7xl">
-            Build a funded path
-            <span className="text-[var(--dp-muted)]"> without the noise.</span>
+            {config.homeHeroTitlePrimary}
+            {config.homeHeroTitleMuted ? (
+              <span className="text-[var(--dp-muted)]">
+                {config.homeHeroTitleMuted}
+              </span>
+            ) : null}
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--dp-muted)] sm:mt-6 sm:text-lg md:text-xl">
-            Clear frameworks, accountability, and a process you can repeat.
-            Start with the basic course, then book a call when you&apos;re ready
-            to go deeper.
+          <p className="mx-auto mt-5 max-w-2xl whitespace-pre-line text-base leading-relaxed text-[var(--dp-muted)] sm:mt-6 sm:text-lg md:text-xl">
+            {config.homeHeroDescription}
           </p>
 
           <div className="mx-auto mt-8 flex w-full min-w-0 max-w-4xl justify-center sm:mt-10">
@@ -55,7 +57,9 @@ export default async function HomePage() {
         </div>
 
         <div className="mx-auto mt-12 max-w-6xl px-3 sm:mt-16 sm:px-4 md:mt-20 md:px-6">
-          <h2 className={sectionHeadingClass}>Student results</h2>
+          <h2 className={sectionHeadingClass}>
+            {config.homeStudentResultsHeading}
+          </h2>
         </div>
 
         <ImageMarqueeRows
@@ -87,11 +91,6 @@ export default async function HomePage() {
                 />
               </div>
             ))}
-          </div>
-          <div className="mt-8 flex justify-center px-3 sm:mt-10 md:mt-12 sm:px-0">
-            <Link href="/basic-course" className={basicCourseCtaClass}>
-              Join now!
-            </Link>
           </div>
         </div>
 

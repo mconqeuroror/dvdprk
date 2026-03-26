@@ -5,6 +5,11 @@ const prisma = new PrismaClient();
 
 const defaultSitePayload = {
   heroVideoUrl: "",
+  homeHeroTitlePrimary: "Build a funded path",
+  homeHeroTitleMuted: " without the noise.",
+  homeHeroDescription:
+    "Clear frameworks, accountability, and a process you can repeat. Start with the basic course, then book a call when you're ready to go deeper.",
+  homeStudentResultsHeading: "Student results",
   sliderRow1: Array(10).fill(""),
   sliderRow2: Array(10).fill(""),
   successVideos: ["", "", ""],

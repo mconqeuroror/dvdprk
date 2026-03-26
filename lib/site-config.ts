@@ -17,6 +17,14 @@ export type FreeCourseModule = {
 
 export type SiteConfig = {
   heroVideoUrl: string;
+  /** Home hero H1 — first line (white) */
+  homeHeroTitlePrimary: string;
+  /** Home hero H1 — second part (muted); optional */
+  homeHeroTitleMuted: string;
+  /** Home hero paragraph under the title */
+  homeHeroDescription: string;
+  /** Home “Student results” section heading */
+  homeStudentResultsHeading: string;
   sliderRow1: string[];
   sliderRow2: string[];
   successVideos: string[];
@@ -31,8 +39,15 @@ const DEFAULT_FREE_MODULES: FreeCourseModule[] = [
   { tag: "Module 3", description: "", videoUrl: "" },
 ];
 
+const DEFAULT_HOME_DESC =
+  "Clear frameworks, accountability, and a process you can repeat. Start with the basic course, then book a call when you're ready to go deeper.";
+
 const DEFAULTS: SiteConfig = {
   heroVideoUrl: "",
+  homeHeroTitlePrimary: "Build a funded path",
+  homeHeroTitleMuted: " without the noise.",
+  homeHeroDescription: DEFAULT_HOME_DESC,
+  homeStudentResultsHeading: "Student results",
   sliderRow1: Array(10).fill(""),
   sliderRow2: Array(10).fill(""),
   successVideos: ["", "", ""],
@@ -42,6 +57,7 @@ const DEFAULTS: SiteConfig = {
 function cloneDefaults(): SiteConfig {
   return {
     ...DEFAULTS,
+    homeHeroDescription: DEFAULT_HOME_DESC,
     sliderRow1: [...DEFAULTS.sliderRow1],
     sliderRow2: [...DEFAULTS.sliderRow2],
     successVideos: [...DEFAULTS.successVideos],
@@ -88,8 +104,17 @@ function normalizeFromUnknown(parsed: unknown): SiteConfig {
     return cloneDefaults();
   }
   const p = parsed as Record<string, unknown>;
+  const primary = String(p.homeHeroTitlePrimary ?? "").trim();
+  const muted = String(p.homeHeroTitleMuted ?? "");
+  const desc = String(p.homeHeroDescription ?? "").trim();
+  const resultsH = String(p.homeStudentResultsHeading ?? "").trim();
   return {
     heroVideoUrl: String(p.heroVideoUrl ?? ""),
+    homeHeroTitlePrimary: primary || DEFAULTS.homeHeroTitlePrimary,
+    homeHeroTitleMuted: muted,
+    homeHeroDescription: desc || DEFAULT_HOME_DESC,
+    homeStudentResultsHeading:
+      resultsH || DEFAULTS.homeStudentResultsHeading,
     sliderRow1: pad10(p.sliderRow1),
     sliderRow2: pad10(p.sliderRow2),
     successVideos: pad3(p.successVideos),
@@ -130,6 +155,14 @@ export async function getSiteConfig(): Promise<SiteConfig> {
 export async function writeSiteConfig(config: SiteConfig): Promise<void> {
   const normalized: SiteConfig = {
     heroVideoUrl: config.heroVideoUrl.trim(),
+    homeHeroTitlePrimary:
+      config.homeHeroTitlePrimary.trim() || DEFAULTS.homeHeroTitlePrimary,
+    homeHeroTitleMuted: config.homeHeroTitleMuted,
+    homeHeroDescription:
+      config.homeHeroDescription.trim() || DEFAULT_HOME_DESC,
+    homeStudentResultsHeading:
+      config.homeStudentResultsHeading.trim() ||
+      DEFAULTS.homeStudentResultsHeading,
     sliderRow1: pad10(config.sliderRow1),
     sliderRow2: pad10(config.sliderRow2),
     successVideos: pad3(config.successVideos),

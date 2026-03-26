@@ -135,7 +135,65 @@ export default async function AdminPanelPage({
         </section>
       </div>
 
-      <form action={saveSiteConfigAction} className="mt-10 space-y-4">
+      <form action={saveSiteConfigAction} className="mt-10 space-y-6">
+        <section className="space-y-3">
+          <h2 className="font-[family-name:var(--font-syne)] text-lg font-semibold text-white">
+            Home page copy
+          </h2>
+          <p className="text-xs text-[var(--dp-muted)]">
+            Shown on <code className="text-white/70">/</code>. Muted line is the
+            gray part after the main headline (leave empty to hide it).
+          </p>
+          <div className="space-y-2">
+            <label className="block text-xs text-[var(--dp-muted)]" htmlFor="homeHeroTitlePrimary">
+              Hero headline (white)
+            </label>
+            <input
+              id="homeHeroTitlePrimary"
+              name="homeHeroTitlePrimary"
+              defaultValue={config.homeHeroTitlePrimary}
+              className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-xs text-[var(--dp-muted)]" htmlFor="homeHeroTitleMuted">
+              Hero headline (muted suffix)
+            </label>
+            <input
+              id="homeHeroTitleMuted"
+              name="homeHeroTitleMuted"
+              defaultValue={config.homeHeroTitleMuted}
+              className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-xs text-[var(--dp-muted)]" htmlFor="homeHeroDescription">
+              Hero paragraph
+            </label>
+            <textarea
+              id="homeHeroDescription"
+              name="homeHeroDescription"
+              rows={4}
+              defaultValue={config.homeHeroDescription}
+              className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <label
+              className="block text-xs text-[var(--dp-muted)]"
+              htmlFor="homeStudentResultsHeading"
+            >
+              “Student results” section title
+            </label>
+            <input
+              id="homeStudentResultsHeading"
+              name="homeStudentResultsHeading"
+              defaultValue={config.homeStudentResultsHeading}
+              className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white"
+            />
+          </div>
+        </section>
+
         <h2 className="font-[family-name:var(--font-syne)] text-lg font-semibold text-white">
           Basic course modules
         </h2>
@@ -153,7 +211,7 @@ export default async function AdminPanelPage({
           type="submit"
           className="rounded-full bg-[var(--dp-accent)] px-8 py-3 text-sm font-semibold text-white hover:opacity-90"
         >
-          Save module titles, descriptions &amp; list
+          Save home copy, module titles, descriptions &amp; list
         </button>
       </form>
     </main>
