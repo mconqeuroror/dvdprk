@@ -63,11 +63,17 @@ export default async function HomePage() {
           </h2>
         </div>
 
-        <ImageMarqueeRows
-          row1={config.sliderRow1}
-          row2={config.sliderRow2}
-          className="mt-6"
-        />
+        <div className="relative z-0 mt-6 w-full">
+          <div
+            className="pointer-events-none absolute left-1/2 top-[42%] z-0 h-[min(72vw,480px)] w-[min(96vw,920px)] -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(ellipse_68%_52%_at_50%_50%,rgba(98,67,255,0.13)_0%,rgba(98,67,255,0.04)_38%,transparent_72%)] sm:top-1/2 sm:h-[min(62vw,520px)]"
+            aria-hidden
+          />
+          <ImageMarqueeRows
+            row1={config.sliderRow1}
+            row2={config.sliderRow2}
+            className="relative z-[1] mt-0"
+          />
+        </div>
 
         <div className="mx-auto mt-8 flex justify-center px-3 sm:mt-10 sm:px-4">
           <Link

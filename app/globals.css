@@ -177,7 +177,7 @@ body {
     0 0 60px rgba(98, 67, 255, 0.32);
 }
 
-/* Marquees — slow when hovering any frame */
+/* Marquees — infinite scroll (constant speed; hover must not change duration) */
 @keyframes dp-marquee-left {
   0% {
     transform: translateX(0);
@@ -204,7 +204,4 @@ body {
   animation: dp-marquee-right 55s linear infinite;
 }
 
-.dp-marquee-track:has(.dp-marquee-frame:hover) .dp-marquee-scroller--left,
-.dp-marquee-track:has(.dp-marquee-frame:hover) .dp-marquee-scroller--right {
-  animation-duration: 120s;
-}
+/* Don’t change duration on hover — it resets animation math and causes jumps/glitches. */
