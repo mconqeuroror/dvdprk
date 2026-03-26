@@ -1,14 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import {
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   FX_WIDGET,
@@ -201,20 +194,6 @@ function pickXYearIndices(
   return sorted;
 }
 
-function subscribeMaxWidth767(cb: () => void) {
-  const mq = window.matchMedia("(max-width: 767px)");
-  mq.addEventListener("change", cb);
-  return () => mq.removeEventListener("change", cb);
-}
-
-function getMaxWidth767Matches() {
-  return window.matchMedia("(max-width: 767px)").matches;
-}
-
-function useIsNarrowMonthly() {
-  return useSyncExternalStore(subscribeMaxWidth767, getMaxWidth767Matches, () => false);
-}
-
 function buildMonthMatrix(months: FxBlueMonthPoint[]) {
   const byYear = new Map<number, (number | null)[]>();
   for (const m of months) {
@@ -226,9 +205,6 @@ function buildMonthMatrix(months: FxBlueMonthPoint[]) {
 }
 
 const MON = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
-
-/** Desktop monthly card preview (mobile uses current year only) */
-const PREVIEW_DESKTOP_YEAR_COUNT = 2;
 
 type YearMatrixRow = [number, (number | null)[]];
 
@@ -678,8 +654,8 @@ function AccountCard({
   );
 }
 
-/** No horizontal scroll: year blocks + 6×2 month grid per year */
-function MonthlyTable({
+/** Full monthly grid only in a modal — no month matrix on the main layout */
+function MonthlyReturnsModalButton({
   months,
   verifyUrl,
 }: {
@@ -687,33 +663,18 @@ function MonthlyTable({
   verifyUrl: string;
 }) {
   const fullMatrix = buildMonthMatrix(months);
-  const narrow = useIsNarrowMonthly();
-  const currentYear = new Date().getFullYear();
-  const previewMatrix = narrow
-    ? (() => {
-        const thisYear = fullMatrix.find(([y]) => y === currentYear);
-        return thisYear ? [thisYear] : fullMatrix.slice(0, 1);
-      })()
-    : fullMatrix.slice(0, PREVIEW_DESKTOP_YEAR_COUNT);
   const [modalOpen, setModalOpen] = useState(false);
   const modalTitleId = useId().replace(/:/g, "");
-  const showViewAll = fullMatrix.length > previewMatrix.length;
 
   return (
-    <div className={`${cardShell} flex flex-col`}>
-      <p className={captionClass}>Monthly returns</p>
-      <div className="flex flex-col gap-4 overflow-x-hidden">
-        <MonthlyYearBlocks matrix={previewMatrix} />
-      </div>
-      {showViewAll ? (
-        <button
-          type="button"
-          onClick={() => setModalOpen(true)}
-          className="mt-3 w-full rounded-lg border border-white/[0.12] bg-white/[0.04] py-2 text-center text-xs font-medium text-white/90 transition hover:bg-white/[0.08]"
-        >
-          View all years
-        </button>
-      ) : null}
+    <div className="mt-3 border-t border-white/[0.06] pt-3">
+      <button
+        type="button"
+        onClick={() => setModalOpen(true)}
+        className="w-full rounded-lg border border-white/[0.12] bg-white/[0.04] py-2.5 text-center text-xs font-medium text-white/90 transition hover:bg-white/[0.08]"
+      >
+        View monthly returns by year
+      </button>
       <VerifyOnFxBlue href={verifyUrl} />
       {modalOpen
         ? createPortal(
@@ -734,20 +695,24 @@ function ProfitCard({
   series,
   verifyUrl,
   currency,
+  months,
+  monthlyVerifyUrl,
 }: {
   series: FxBlueCumulativePoint[];
   verifyUrl: string;
   currency: string;
+  months: FxBlueMonthPoint[] | null;
+  monthlyVerifyUrl: string;
 }) {
   const last = series[series.length - 1]!;
   return (
-    <div className={`${cardShell} flex flex-col`}>
+    <div className={`${cardShell} flex min-h-0 flex-1 flex-col`}>
       <p className={captionClass}>Cumulative profit</p>
-      <div className="flex flex-col rounded-[10px] bg-black/40 ring-1 ring-inset ring-white/[0.06]">
-        <div className="relative h-[220px] w-full min-w-0 md:h-[280px]">
+      <div className="flex min-h-0 w-full flex-1 flex-col rounded-[10px] bg-black/40 ring-1 ring-inset ring-white/[0.06]">
+        <div className="relative min-h-[240px] w-full min-w-0 flex-1 basis-0 md:min-h-[400px] lg:min-h-[min(480px,58vh)]">
           <CumulativeChart series={series} currency={currency} />
         </div>
-        <p className="border-t border-white/[0.06] px-3 py-2 text-center text-xs leading-snug text-[var(--dp-muted)]">
+        <p className="shrink-0 border-t border-white/[0.06] px-3 py-2 text-center text-xs leading-snug text-[var(--dp-muted)]">
           <span className="text-white/75">{series[0]?.date}</span>
           <span className="text-white/35"> → </span>
           <span className="text-white/75">{last.date}</span>
@@ -759,6 +724,12 @@ function ProfitCard({
         </p>
       </div>
       <VerifyOnFxBlue href={verifyUrl} />
+      {months?.length ? (
+        <MonthlyReturnsModalButton
+          months={months}
+          verifyUrl={monthlyVerifyUrl}
+        />
+      ) : null}
     </div>
   );
 }
@@ -784,29 +755,33 @@ const IFRAMES = [
   },
 ] as const;
 
-/** Mobile: account → profit → monthly. Desktop: profit | monthly | account */
-function WidgetGrid({
-  profit,
+/** Account data left, large cumulative chart right (mobile: account then chart) */
+function TwoColTrackGrid({
   account,
-  monthly,
+  profit,
 }: {
-  profit: React.ReactNode;
   account: React.ReactNode;
-  monthly: React.ReactNode;
+  profit: React.ReactNode;
 }) {
   return (
-    <div className="mx-auto mt-9 grid w-full max-w-6xl grid-cols-1 gap-6 sm:mt-11 md:grid-cols-3 md:items-start md:gap-5 lg:gap-6">
-      <div className="order-2 min-w-0 md:order-1">{profit}</div>
-      <div className="order-3 min-w-0 md:order-2">{monthly}</div>
-      <div className="order-1 min-w-0 md:order-3">{account}</div>
+    <div className="mx-auto mt-9 grid w-full max-w-6xl grid-cols-1 gap-6 sm:mt-11 md:grid-cols-[minmax(272px,320px)_1fr] md:items-start md:gap-6 lg:gap-8">
+      <div className="order-1 min-w-0">{account}</div>
+      <div className="order-2 flex min-h-0 w-full min-w-0 flex-col md:min-h-[min(560px,72vh)]">
+        {profit}
+      </div>
     </div>
   );
 }
 
 function IframeFallback({ verify }: { verify: ApiPayload["verify"] | null }) {
   const id = fxBluePublisherId();
+  const monthlySrc =
+    verify?.monthly || fxBlueWidgetUrl(FX_WIDGET.monthly, id);
 
-  const makeIframe = (f: (typeof IFRAMES)[number]) => {
+  const makeIframe = (
+    f: (typeof IFRAMES)[number],
+    opts?: { tall?: boolean },
+  ) => {
     const verifyKey =
       f.chart === FX_WIDGET.cumulative
         ? "cumulative"
@@ -814,6 +789,10 @@ function IframeFallback({ verify }: { verify: ApiPayload["verify"] | null }) {
           ? "account"
           : "monthly";
     const src = verify?.[verifyKey] || fxBlueWidgetUrl(f.chart, id);
+    const boxMin =
+      opts?.tall === true
+        ? "min-h-[260px] md:min-h-[min(520px,62vh)]"
+        : "min-h-[200px] md:min-h-[280px]";
     return (
       <figure
         key={f.widgetKey}
@@ -822,11 +801,13 @@ function IframeFallback({ verify }: { verify: ApiPayload["verify"] | null }) {
         <div className={`${cardShell} flex flex-col`}>
           <p className={captionClass}>{f.label}</p>
           <VerifyOnFxBlue href={src} />
-          <div className="mt-3 min-h-[200px] flex-1 overflow-hidden rounded-[10px] bg-[#0f1117] ring-1 ring-inset ring-[rgba(255,255,255,0.06)] md:min-h-[280px]">
+          <div
+            className={`mt-3 overflow-hidden rounded-[10px] bg-[#0f1117] ring-1 ring-inset ring-[rgba(255,255,255,0.06)] ${boxMin}`}
+          >
             <iframe
               src={src}
               title={f.title}
-              className="block h-full min-h-[200px] w-full"
+              className="block h-full min-h-[200px] w-full md:min-h-[280px]"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               style={{ colorScheme: "dark" }}
@@ -838,11 +819,22 @@ function IframeFallback({ verify }: { verify: ApiPayload["verify"] | null }) {
   };
 
   return (
-    <WidgetGrid
-      profit={makeIframe(IFRAMES[0])}
-      account={makeIframe(IFRAMES[1])}
-      monthly={makeIframe(IFRAMES[2])}
-    />
+    <>
+      <TwoColTrackGrid
+        account={makeIframe(IFRAMES[1])}
+        profit={makeIframe(IFRAMES[0], { tall: true })}
+      />
+      <p className="mx-auto mt-5 max-w-2xl text-center text-xs text-[var(--dp-muted)]">
+        <a
+          href={monthlySrc}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[var(--dp-accent)] underline-offset-2 hover:underline"
+        >
+          Open monthly returns (FX Blue widget)
+        </a>
+      </p>
+    </>
   );
 }
 
@@ -892,29 +884,8 @@ export function FxBlueTrackRecord() {
       </p>
 
       {!payload && !loadError ? (
-        <div className="mx-auto mt-9 grid w-full max-w-6xl animate-pulse grid-cols-1 gap-6 md:grid-cols-3 md:items-start md:gap-5 lg:gap-6">
-          <div
-            className={`order-2 md:order-1 ${cardShell} flex flex-col`}
-          >
-            <div className="mb-3 h-3 w-28 rounded bg-white/[0.08]" />
-            <div className="mb-3 h-[220px] w-full rounded-lg bg-white/[0.06] md:h-[280px]" />
-            <div className="h-8 w-full rounded bg-white/[0.05]" />
-            <div className="mt-2 h-3 w-12 rounded bg-white/[0.08]" />
-          </div>
-          <div
-            className={`order-3 md:order-2 ${cardShell} flex flex-col`}
-          >
-            <div className="mb-3 h-3 w-32 rounded bg-white/[0.08]" />
-            <div className="flex flex-col gap-3">
-              <div className="h-24 w-full rounded-lg bg-white/[0.06]" />
-              <div className="h-24 w-full rounded-lg bg-white/[0.06]" />
-            </div>
-            <div className="mt-3 h-8 w-full rounded-lg bg-white/[0.06]" />
-            <div className="mt-2 h-3 w-12 rounded bg-white/[0.08]" />
-          </div>
-          <div
-            className={`order-1 md:order-3 ${cardShell} flex flex-col`}
-          >
+        <div className="mx-auto mt-9 grid w-full max-w-6xl animate-pulse grid-cols-1 gap-6 md:grid-cols-[minmax(272px,320px)_1fr] md:items-start md:gap-6 lg:gap-8">
+          <div className={`${cardShell} flex flex-col`}>
             <div className="mb-3 h-3 w-40 rounded bg-white/[0.08]" />
             <div className="flex flex-col gap-2">
               {Array.from({ length: 8 }).map((_, i) => (
@@ -926,26 +897,28 @@ export function FxBlueTrackRecord() {
             </div>
             <div className="mt-3 h-3 w-12 rounded bg-white/[0.08]" />
           </div>
+          <div className={`${cardShell} flex flex-col`}>
+            <div className="mb-3 h-3 w-28 rounded bg-white/[0.08]" />
+            <div className="mb-3 min-h-[240px] w-full rounded-lg bg-white/[0.06] md:min-h-[400px] lg:min-h-[480px]" />
+            <div className="h-8 w-full rounded bg-white/[0.05]" />
+            <div className="mt-2 h-3 w-12 rounded bg-white/[0.08]" />
+          </div>
         </div>
       ) : showCustom && payload ? (
-        <WidgetGrid
-          profit={
-            <ProfitCard
-              series={payload.cumulative!}
-              verifyUrl={payload.verify.cumulative}
-              currency={payload.account!.currency}
-            />
-          }
+        <TwoColTrackGrid
           account={
             <AccountCard
               data={payload.account!}
               verifyUrl={payload.verify.account}
             />
           }
-          monthly={
-            <MonthlyTable
+          profit={
+            <ProfitCard
+              series={payload.cumulative!}
+              verifyUrl={payload.verify.cumulative}
+              currency={payload.account!.currency}
               months={payload.monthly!}
-              verifyUrl={payload.verify.monthly}
+              monthlyVerifyUrl={payload.verify.monthly}
             />
           }
         />
@@ -968,8 +941,10 @@ export function FxBlueTrackRecord() {
           not just trading — a lower balance can mean cash was taken out, not
           that the strategy “lost” that amount. For performance, focus on{" "}
           <strong className="text-white/75">closed profit</strong>, the{" "}
-          <strong className="text-white/75">cumulative profit</strong> curve, and{" "}
-          <strong className="text-white/75">monthly return %</strong>.
+          <strong className="text-white/75">cumulative profit</strong> curve;{" "}
+          <strong className="text-white/75">monthly return %</strong> is available
+          via <strong className="text-white/75">View monthly returns by year</strong>{" "}
+          under the chart.
         </p>
         <p className="mt-1.5 sm:mt-2">
           <strong className="text-white/80">Trust and verification:</strong> Data
@@ -982,8 +957,8 @@ export function FxBlueTrackRecord() {
           >
             FX Blue
           </a>{" "}
-          widgets. Use the <strong className="text-white/75">Verify</strong> link
-          on each card to open the official widget and compare.
+          widgets. Use <strong className="text-white/75">Verify</strong> links to
+          open the official widgets and compare.
         </p>
       </div>
     </section>
