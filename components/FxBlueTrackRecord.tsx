@@ -252,7 +252,9 @@ function MonthReturnCell({
   scaleMax: number;
 }) {
   const cellClass =
-    "flex h-11 w-full min-w-0 items-center justify-center rounded-md border px-0.5 text-center text-[0.62rem] font-semibold tabular-nums leading-none text-white sm:h-12 sm:text-[0.68rem]";
+    "flex min-h-[2.75rem] w-full min-w-0 items-center justify-center rounded-md border px-1 py-1.5 text-center text-[0.6rem] font-semibold tabular-nums leading-snug text-white sm:min-h-[3rem] sm:px-1.5 sm:text-[0.68rem] md:text-[0.72rem]";
+  const pctClass =
+    "block w-full max-w-full whitespace-normal text-center leading-tight tracking-tight break-words";
   if (value === null) {
     return (
       <div className="flex min-w-0 flex-col gap-1.5">
@@ -279,7 +281,7 @@ function MonthReturnCell({
           className={`${cellClass} border-emerald-400/25`}
           style={{ backgroundColor: `rgba(5, 150, 105, ${alpha})` }}
         >
-          <span className="max-w-full truncate">{formatPct(value)}</span>
+          <span className={pctClass}>{formatPct(value)}</span>
         </div>
       </div>
     );
@@ -293,7 +295,7 @@ function MonthReturnCell({
         className={`${cellClass} border-red-400/25`}
         style={{ backgroundColor: `rgba(220, 38, 38, ${alpha})` }}
       >
-        <span className="max-w-full truncate">{formatPct(value)}</span>
+        <span className={pctClass}>{formatPct(value)}</span>
       </div>
     </div>
   );
@@ -311,7 +313,7 @@ function MonthlyYearBlocks({ matrix }: { matrix: YearMatrixRow[] }) {
           <h4 className="mb-3 border-b border-white/[0.1] pb-2 text-left text-sm font-semibold tracking-tight text-white">
             {year}
           </h4>
-          <div className="grid grid-cols-6 gap-2 sm:gap-2.5">
+          <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
             {cells.map((v, i) => (
               <MonthReturnCell
                 key={i}
