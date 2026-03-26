@@ -1,3 +1,4 @@
+import type { UtmTrackedLink } from "@prisma/client";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -30,30 +31,45 @@ export default async function AdminUtmLinkDetailPage({
   const sp = await searchParams;
   const origin = await getPublicSiteOrigin();
 
-  const link = await prisma.utmTrackedLink.findUnique({
-    where: { id },
-    include: { _count: { select: { clicks: true } } },
-  });
-
-  if (!link) notFound();
-
   const now = new Date();
   const since30 = new Date(now.getTime() - 30 * 86400000);
   const since7 = new Date(now.getTime() - 7 * 86400000);
   const since24 = new Date(now.getTime() - 86400000);
 
-  const [recentClicks, total7, total24] = await Promise.all([
-    prisma.utmLinkClick.findMany({
-      where: { linkId: id, createdAt: { gte: since30 } },
-      select: { createdAt: true },
-    }),
-    prisma.utmLinkClick.count({
-      where: { linkId: id, createdAt: { gte: since7 } },
-    }),
-    prisma.utmLinkClick.count({
-      where: { linkId: id, createdAt: { gte: since24 } },
-    }),
-  ]);
+  type LinkRow = UtmTrackedLink & { _count: { clicks: number } };
+  let link: LinkRow;
+  let recentClicks: { createdAt: Date }[];
+  let total7: number;
+  let total24: number;
+
+  try {
+    const found = await prisma.utmTrackedLink.findUnique({
+      where: { id },
+      include: { _count: { select: { clicks: true } } },
+    });
+
+    if (!found) notFound();
+    link = found;
+
+    const rows = await Promise.all([
+      prisma.utmLinkClick.findMany({
+        where: { linkId: id, createdAt: { gte: since30 } },
+        select: { createdAt: true },
+      }),
+      prisma.utmLinkClick.count({
+        where: { linkId: id, createdAt: { gte: since7 } },
+      }),
+      prisma.utmLinkClick.count({
+        where: { linkId: id, createdAt: { gte: since24 } },
+      }),
+    ]);
+    recentClicks = rows[0];
+    total7 = rows[1];
+    total24 = rows[2];
+  } catch (e) {
+    console.error("[admin/utm/[id]]", e);
+    redirect("/admin/utm?error=db");
+  }
 
   const series30 = bucketClicksByDay(
     recentClicks.map((c) => c.createdAt),

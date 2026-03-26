@@ -21,6 +21,7 @@ export default async function AdminUtmPage({
   searchParams: Promise<{
     error?: string;
     deleted?: string;
+    db?: string;
   }>;
 }) {
   const jar = await cookies();
@@ -35,18 +36,24 @@ export default async function AdminUtmPage({
   type LinkRow = UtmTrackedLink & { _count: { clicks: number } };
   let links: LinkRow[] = [];
   let shareRows: { name: string; count: number; share: number }[] = [];
+  let loadError = false;
 
   if (db) {
-    links = await prisma.utmTrackedLink.findMany({
-      orderBy: { createdAt: "desc" },
-      include: { _count: { select: { clicks: true } } },
-    });
-    const total = links.reduce((s, l) => s + l._count.clicks, 0);
-    shareRows = links.map((l) => ({
-      name: l.name,
-      count: l._count.clicks,
-      share: total > 0 ? l._count.clicks / total : 0,
-    }));
+    try {
+      links = await prisma.utmTrackedLink.findMany({
+        orderBy: { createdAt: "desc" },
+        include: { _count: { select: { clicks: true } } },
+      });
+      const total = links.reduce((s, l) => s + l._count.clicks, 0);
+      shareRows = links.map((l) => ({
+        name: l.name,
+        count: l._count.clicks,
+        share: total > 0 ? l._count.clicks / total : 0,
+      }));
+    } catch (e) {
+      console.error("[admin/utm] list failed", e);
+      loadError = true;
+    }
   }
 
   return (
@@ -80,11 +87,12 @@ export default async function AdminUtmPage({
       </div>
 
       <p className="mt-4 text-sm text-[var(--dp-muted)]">
-        Short URLs like{" "}
-        <code className="text-white/80">/r/yourcode</code> record a click, then
-        send visitors to your destination with UTM parameters. Use{" "}
-        <code className="text-white/80">NEXT_PUBLIC_SITE_URL</code> in production
-        so copied links use your real domain.
+        Short URLs like <code className="text-white/80">/r/yourcode</code> log a
+        click, then redirect with UTM parameters. Each link can target{" "}
+        <code className="text-white/80">/</code> or{" "}
+        <code className="text-white/80">/basic-course</code> (or any URL). Set{" "}
+        <code className="text-white/80">NEXT_PUBLIC_SITE_URL</code> on Vercel for
+        correct tracking links.
       </p>
 
       {sp.deleted ? (
@@ -109,10 +117,29 @@ export default async function AdminUtmPage({
           Could not allocate a unique short code — try again.
         </p>
       ) : null}
+      {sp.error === "db" || sp.db === "1" ? (
+        <p className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-200">
+          Database error loading UTM tables. On the machine that has your
+          production <code className="text-white/80">DATABASE_URL</code>, run{" "}
+          <code className="text-white/80">npx prisma db push</code> (same URL as
+          Vercel). Then redeploy or try again.
+        </p>
+      ) : null}
+      {loadError ? (
+        <p className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-200">
+          Could not query the database (missing tables, connection, or timeout).
+          Run <code className="text-white/80">npx prisma db push</code> against
+          the database Vercel uses, then refresh.
+        </p>
+      ) : null}
 
       {!db ? (
         <p className="mt-8 text-sm text-[var(--dp-muted)]">
           UTM tracking is disabled until the database is connected.
+        </p>
+      ) : loadError ? (
+        <p className="mt-8 text-sm text-[var(--dp-muted)]">
+          Fix the database issue above, then reload this page.
         </p>
       ) : (
         <>
