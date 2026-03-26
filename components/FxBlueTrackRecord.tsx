@@ -642,16 +642,16 @@ function ProfitCard({
     <div className={`${cardShell} ${DATA_PANEL_MIN_H} h-full`}>
       <p className={captionClass}>Cumulative profit</p>
       <div className="flex min-h-0 flex-1 flex-col rounded-[10px] bg-black/40 ring-1 ring-inset ring-white/[0.06]">
-        <div className="min-h-[220px] flex-1 md:min-h-[280px]">
-          <CumulativeChart series={series} />
+        <div className="w-full shrink-0">
+          <CumulativeChart series={series} currency={currency} />
         </div>
-        <p className="border-t border-white/[0.06] px-2 py-1.5 text-center text-[0.65rem] leading-snug text-[var(--dp-muted)]">
-          <span className="text-white/70">{series[0]?.date}</span>
-          {" → "}
-          <span className="text-white/70">{last.date}</span>
-          <span className="mx-1 text-white/30">·</span>
-          Latest cumulative{" "}
-          <span className="font-medium text-white/90">
+        <p className="mt-auto border-t border-white/[0.06] px-3 py-2 text-center text-xs leading-snug text-[var(--dp-muted)]">
+          <span className="text-white/75">{series[0]?.date}</span>
+          <span className="text-white/35"> → </span>
+          <span className="text-white/75">{last.date}</span>
+          <span className="mx-1.5 text-white/25">·</span>
+          <span className="text-white/55">Latest cumulative </span>
+          <span className="font-semibold tabular-nums text-white/90">
             {formatMoney(last.profit, currency)}
           </span>
         </p>
