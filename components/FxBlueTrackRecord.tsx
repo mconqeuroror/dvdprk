@@ -1,16 +1,19 @@
 const FX_CHARTS = [
   {
-    key: "account",
-    title: "Live account overview — FX Blue",
-    src: "https://www.fxblue.com/fxbluechart.aspx?c=ch_accountinfo&id=david_perk",
-  },
-  {
     key: "profit",
+    label: "Cumulative profit",
     title: "Cumulative profit — FX Blue",
     src: "https://www.fxblue.com/fxbluechart.aspx?c=ch_cumulativeprofit&id=david_perk",
   },
   {
+    key: "account",
+    label: "Live account & equity",
+    title: "Live account overview — FX Blue",
+    src: "https://www.fxblue.com/fxbluechart.aspx?c=ch_accountinfo&id=david_perk",
+  },
+  {
     key: "monthly",
+    label: "Monthly returns",
     title: "Monthly return table — FX Blue",
     src: "https://www.fxblue.com/fxbluechart.aspx?c=ch_monthlyreturntable&id=david_perk",
   },
@@ -22,26 +25,37 @@ const sectionHeadingClass =
 function ChartFrame({
   src,
   title,
+  label,
 }: {
   src: string;
   title: string;
+  label: string;
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-white/12 bg-[var(--dp-surface)]/25 shadow-lg shadow-black/30">
-      <iframe
-        src={src}
-        title={title}
-        className="block aspect-[2/1] min-h-[180px] w-full sm:min-h-[200px] md:min-h-[220px] lg:min-h-[240px]"
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-      />
-    </div>
+    <figure className="w-full">
+      <div
+        className="overflow-hidden rounded-2xl border border-white/[0.14] bg-gradient-to-b from-white/[0.07] to-black/35 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.75)] ring-1 ring-inset ring-white/[0.05] transition-[border-color,box-shadow] duration-300 hover:border-white/20 hover:shadow-[0_16px_48px_-10px_rgba(0,0,0,0.65)]"
+      >
+        <div className="bg-black/25">
+          <iframe
+            src={src}
+            title={title}
+            className="block aspect-[2/1] min-h-[192px] w-full sm:min-h-[210px] md:min-h-[228px] lg:min-h-[248px]"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </div>
+      </div>
+      <figcaption className="mt-3 text-center text-[0.7rem] font-medium uppercase tracking-[0.12em] text-[var(--dp-muted)] sm:text-xs">
+        {label}
+      </figcaption>
+    </figure>
   );
 }
 
 /**
- * 2×2 grid: account (top-left), cumulative profit (top-right),
- * monthly table (bottom-left); bottom-right empty for balance.
+ * 2×2 grid: cumulative profit (top-left), account / equity (top-right),
+ * monthly returns (bottom-left); bottom-right empty.
  */
 export function FxBlueTrackRecord() {
   return (
@@ -59,18 +73,18 @@ export function FxBlueTrackRecord() {
         Inspect track record of my forex live account.
       </p>
 
-      <div className="mx-auto mt-8 grid max-w-5xl grid-cols-1 gap-4 sm:mt-10 sm:gap-5 md:grid-cols-2 md:gap-x-8 md:gap-y-6 lg:max-w-6xl">
-        <div className="mx-auto w-full max-w-[440px] md:mx-0 md:justify-self-end md:pr-1 lg:max-w-[460px] lg:pr-2">
+      <div className="mx-auto mt-9 grid max-w-6xl grid-cols-1 gap-7 sm:mt-11 sm:gap-8 md:grid-cols-2 md:gap-x-10 md:gap-y-8">
+        <div className="mx-auto w-full max-w-[480px] md:mx-0 md:max-w-none md:justify-self-end md:pr-2 lg:max-w-[500px]">
           <ChartFrame {...FX_CHARTS[0]} />
         </div>
-        <div className="mx-auto w-full max-w-[440px] md:mx-0 md:justify-self-start md:pl-1 lg:max-w-[460px] lg:pl-2">
+        <div className="mx-auto w-full max-w-[480px] md:mx-0 md:max-w-none md:justify-self-start md:pl-2 lg:max-w-[500px]">
           <ChartFrame {...FX_CHARTS[1]} />
         </div>
-        <div className="mx-auto w-full max-w-[440px] md:mx-0 md:justify-self-end md:pr-1 lg:max-w-[460px] lg:pr-2">
+        <div className="mx-auto w-full max-w-[480px] md:mx-0 md:max-w-none md:justify-self-end md:pr-2 lg:max-w-[500px]">
           <ChartFrame {...FX_CHARTS[2]} />
         </div>
         <div
-          className="hidden md:block md:min-h-[100px] md:justify-self-start md:pl-1 lg:pl-2"
+          className="hidden md:block md:min-h-[80px] md:justify-self-start md:pl-2"
           aria-hidden
         />
       </div>
